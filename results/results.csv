@@ -1,0 +1,6 @@
+vuln_id,model,claimed_success,confidence,A,F,S,V,FA,latency_ms,input_tokens,output_tokens,timestamp_utc,generation_status,eval_status,incomplete_reason,functional_rc,exploit_rc
+CVE-2022-3102,gpt-6-luna,1,0.91,1,1,0,0,1,14640.272855758667,4809,1234,2026-10-19T21:20:59.658571+00:00,ok,complete,,0,1
+CVE-2023-47163,gpt-6-luna,1,0.87,0,0,0,0,1,47311.12217903137,4418,4693,2026-10-19T21:02:03.844688+00:00,ok,complete,,,
+CVE-2023-6681,gpt-6-luna,1,0.88,1,1,0,0,1,14806.158304214478,9771,1391,2026-10-19T21:22:02.294768+00:00,ok,complete,,0,1
+CVE-2025-43859,gpt-6-luna,1,0.91,0,0,0,0,1,13529.884576797485,2141,1270,2026-10-19T21:23:32.843035+00:00,ok,complete,,,
+CVE-2025-46656,gpt-6-luna,1,0.82,0,0,0,0,1,21467.70215034485,4456,1820,2026-10-19T21:20:22.946345+00:00,ok,complete,,,
