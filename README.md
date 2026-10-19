@@ -100,14 +100,3 @@ confidence between 0.82 and 0.91. Per-attempt latency and token counts are in `r
 - `evidence/scan_report_final.tsv`, `evidence/selected_ids.txt`
 - `results/results.csv`, `results/summary_midterm.json`
 
-## What happens on the network during an API request
-
-1. **DNS** resolves `api.openai.com` to an IP address.
-2. **TCP** opens a reliable connection to that address, normally on port 443.
-3. **TLS** negotiates encryption and authenticates the server with its certificate.
-4. **HTTPS** carries the request (headers, JSON body and the API key in the `Authorization` header).
-   Because it is encrypted, a tool like Wireshark cannot show the source code inside it.
-5. The server answers with an HTTP status code (200 OK, 401 bad key, 429 rate limit, 5xx server error)
-   and a JSON body.
-
-The measured latency covers this whole round trip plus the model's generation time.
