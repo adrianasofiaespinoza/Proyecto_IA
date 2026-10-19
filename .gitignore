@@ -33,3 +33,9 @@ __pycache__/
 # misc
 *.log
 *.tmp
+.env
+.proyect/
+.venv/
+workspaces/
+*.key
+__pycache__/
