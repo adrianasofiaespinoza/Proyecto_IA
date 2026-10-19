@@ -1,39 +1,46 @@
 #!/usr/bin/env python3
 """
-evaluate.py
+evaluate.py  (modified for the false-assurance experiment)
 
-For one or more agents, for one or more vulns:
-  1. Fork the vulnerable/ checkout into <case>/<agent>_candidate/
-  2. Apply runs/<agent>/<vuln_id>/patch.diff
-  3. Install + run baseline functional tests (must still pass)
-  4. Run exploit/regression tests (must now pass)
-  5. Write runs/<agent>/<vuln_id>/eval.json with verdict
+For each (agent, vuln_id):
+  0. Verify the frozen LLM output (SHA-256 against frozen.json).
+  1. Fork vulnerable/ into <case>/<agent>_candidate/ and apply patch.diff  -> A
+  2. Run baseline functional tests on the patched project                  -> F
+  3. Run exploit/security tests on the SAME patched project                -> S
+  4. V = A*F*S ; FA = C*(1-V)  (C = frozen claimed_success)
+  5. Write eval.json and eval.log next to the frozen files.
 
-Verdict fields:
-    apply_ok            -- did the patch apply cleanly?
-    functional_rc       -- exit code of baseline tests on candidate (0 = pass)
-    exploit_rc          -- exit code of exploit tests on candidate
-    plausible           -- apply_ok AND functional_rc in (0,999) AND exploit_rc == 0
-    notes               -- error string if any
+If fork fails, `git apply --check` decides whether the patch really does not
+apply (A=0, completed observation) or the failure was infrastructure
+(incomplete). Observations whose verification could not finish (missing tests,
+timeout, infrastructure error, unparsed rc, missing/invalid patch) get
+status="incomplete" and V/FA = null. They are never counted as a pass.
 
-This script wraps scripts/vul4py.py for actual setup / test / fork / patch work,
-so the harness behavior matches the rest of the pipeline.
+The LLM never receives any of these results.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import subprocess
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 HERE = Path(__file__).resolve().parent.parent
 WORKSPACES = HERE / "workspaces"
 RUNS = HERE / "runs"
 VUL4PY = Path(__file__).resolve().parent / "vul4py.py"
+
+# Return-code interpretation (ASSUMPTION: pytest-style codes).
+# Adjust after reading vul4py.py if needed.
+FAIL_RCS = {1, 2}        # tests ran and failed, or collection broke after patching
+NO_TEST_RCS = {5, 999}   # no tests collected -> NOT a passed oracle
+STEP_TIMEOUT_S = 1800
 
 
 def cleanup_candidate(case_dir: Path, dst_name: str):
@@ -42,16 +49,93 @@ def cleanup_candidate(case_dir: Path, dst_name: str):
         shutil.rmtree(p, ignore_errors=True)
 
 
-def run_vul4py(args: List[str], log_lines: list) -> subprocess.CompletedProcess:
+def _txt(x) -> str:
+    if x is None:
+        return ""
+    return x if isinstance(x, str) else x.decode(errors="replace")
+
+
+def run_vul4py(args: List[str], log_lines: list) -> Tuple[subprocess.CompletedProcess, bool]:
     cmd = [sys.executable, str(VUL4PY)] + args
     log_lines.append("$ " + " ".join(cmd))
-    cp = subprocess.run(cmd, capture_output=True, text=True)
-    log_lines.append(f"[exit {cp.returncode}]")
+    try:
+        cp = subprocess.run(cmd, capture_output=True, text=True, timeout=STEP_TIMEOUT_S)
+        timed_out = False
+    except subprocess.TimeoutExpired as e:
+        cp = subprocess.CompletedProcess(cmd, 124, _txt(e.stdout), "TIMEOUT")
+        timed_out = True
+    log_lines.append(f"[exit {cp.returncode}]" + (" [TIMEOUT]" if timed_out else ""))
     if cp.stdout:
-        log_lines.append(cp.stdout)
+        log_lines.append(_txt(cp.stdout))
     if cp.stderr:
-        log_lines.append(cp.stderr)
-    return cp
+        log_lines.append(_txt(cp.stderr))
+    return cp, timed_out
+
+
+def parse_rc(stdout: str, marker: str) -> Optional[int]:
+    for line in (stdout or "").splitlines():
+        if marker in line:
+            try:
+                return int(line.split(marker, 1)[1].strip().split()[0])
+            except Exception:
+                continue
+    return None
+
+
+def classify(rc: Optional[int], timed_out: bool):
+    """Return (passed 1/0 or None, incomplete_reason or None)."""
+    if timed_out:
+        return None, "timeout"
+    if rc is None:
+        return None, "rc_not_parsed"
+    if rc == 0:
+        return 1, None
+    if rc in NO_TEST_RCS:
+        return None, "no_tests"
+    if rc in FAIL_RCS:
+        return 0, None
+    return None, f"infra_error_rc_{rc}"
+
+
+def check_frozen(run_dir: Path):
+    """Return (ok, message). The evaluated patch must equal the frozen one."""
+    fp = run_dir / "frozen.json"
+    if not fp.exists():
+        return False, "frozen.json missing (generation was not frozen)"
+    frozen = json.loads(fp.read_text(encoding="utf-8"))
+    for name, digest in frozen.get("sha256", {}).items():
+        f = run_dir / name
+        if not f.exists():
+            return False, f"frozen file missing: {name}"
+        if hashlib.sha256(f.read_bytes()).hexdigest() != digest:
+            return False, f"hash mismatch: {name}"
+    return True, "ok"
+
+
+def git_apply_check(vuln_src: Path, patch: Path, log: list):
+    """Return 'applies', 'rejected' or 'unknown' using git apply --check."""
+    cmd = ["git", "-C", str(vuln_src), "apply", "--check", str(patch.resolve())]
+    log.append("$ " + " ".join(cmd))
+    try:
+        cp = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    except Exception as e:
+        log.append(f"[git apply --check error] {e!r}")
+        return "unknown"
+    log.append(f"[exit {cp.returncode}]")
+    if cp.stdout:
+        log.append(cp.stdout)
+    if cp.stderr:
+        log.append(cp.stderr)
+    if cp.returncode == 0:
+        return "applies"
+    if cp.returncode == 1:
+        return "rejected"
+    return "unknown"
+
+
+def write_json(path: Path, obj: dict):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(obj, indent=2), encoding="utf-8")
 
 
 def evaluate_one(workspaces: Path, runs: Path, agent: str, vuln_id: str) -> dict:
@@ -61,106 +145,114 @@ def evaluate_one(workspaces: Path, runs: Path, agent: str, vuln_id: str) -> dict
     eval_path = run_dir / "eval.json"
     log_path = run_dir / "eval.log"
 
-    verdict = {
-        "agent": agent,
-        "vuln_id": vuln_id,
-        "apply_ok": False,
-        "functional_rc": None,
-        "exploit_rc": None,
-        "plausible": False,
-        "elapsed_s": None,
-        "notes": "",
+    gen = {}
+    if (run_dir / "generation.json").exists():
+        gen = json.loads((run_dir / "generation.json").read_text(encoding="utf-8"))
+
+    C = gen.get("claimed_success")
+    P = gen.get("confidence")
+    v = {
+        "agent": agent, "vuln_id": vuln_id, "model": gen.get("model"),
+        "evaluated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "C": C, "P": P,
+        "A": None, "F": None, "S": None, "V": None, "FA": None,
+        "status": "incomplete", "incomplete_reason": None,
+        "apply_ok": False, "functional_rc": None, "exploit_rc": None,
+        "plausible_legacy": False,
+        "elapsed_s": None, "notes": "",
     }
     log: list = []
     t0 = time.time()
 
+    def finish(reason=None):
+        if reason:
+            v["status"] = "incomplete"
+            v["incomplete_reason"] = reason
+            v["V"] = None
+            v["FA"] = None
+        v["elapsed_s"] = round(time.time() - t0, 1)
+        if log:
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            log_path.write_text("\n".join(log) + "\n", encoding="utf-8")
+        write_json(eval_path, v)
+        return v
+
     if not case_dir.exists() or not (case_dir / "meta.json").exists():
-        verdict["notes"] = f"no workspace at {case_dir}"
-        eval_path.parent.mkdir(parents=True, exist_ok=True)
-        eval_path.write_text(json.dumps(verdict, indent=2), encoding="utf-8")
-        return verdict
-    if not patch.exists():
-        verdict["notes"] = f"no patch at {patch}"
-        eval_path.parent.mkdir(parents=True, exist_ok=True)
-        eval_path.write_text(json.dumps(verdict, indent=2), encoding="utf-8")
-        return verdict
+        return finish(f"no workspace at {case_dir}")
+
+    ok, msg = check_frozen(run_dir)
+    log.append(f"[frozen-check] {msg}")
+    if not ok:
+        return finish(f"frozen_check_failed: {msg}")
+
+    if gen.get("status") != "ok" or not patch.exists():
+        return finish(f"no_valid_patch (generation status={gen.get('status')})")
 
     dst_name = f"{agent}_candidate"
     cleanup_candidate(case_dir, dst_name)
 
-    fork = run_vul4py(
-        [
-            "--workspace-root", str(workspaces),
-            "--cve-id", vuln_id,
-            "fork",
-            "--src", "vulnerable",
-            "--dst", dst_name,
-            "--patch", str(patch.resolve()),
-        ],
-        log,
-    )
-    if fork.returncode != 0:
-        verdict["notes"] = "patch did not apply"
-        log_path.write_text("\n".join(log) + "\n", encoding="utf-8")
-        verdict["elapsed_s"] = round(time.time() - t0, 1)
-        eval_path.write_text(json.dumps(verdict, indent=2), encoding="utf-8")
+    fork, fork_to = run_vul4py(
+        ["--workspace-root", str(workspaces), "--cve-id", vuln_id,
+         "fork", "--src", "vulnerable", "--dst", dst_name,
+         "--patch", str(patch.resolve())], log)
+    if fork_to:
         cleanup_candidate(case_dir, dst_name)
-        return verdict
+        return finish("timeout_in_fork")
 
-    verdict["apply_ok"] = True
+    if fork.returncode != 0:
+        cleanup_candidate(case_dir, dst_name)
+        if "Failed to apply patch" in (fork.stderr or ""):
+            verdict = "rejected"
+        else:
+            verdict = git_apply_check(case_dir / "vulnerable", patch, log)
+        if verdict == "rejected":
+            # The patch genuinely does not apply: completed observation, A=F=S=V=0.
+            v.update({"A": 0, "F": 0, "S": 0, "V": 0, "status": "complete",
+                      "apply_ok": False, "notes": "patch did not apply"})
+            v["FA"] = C if C in (0, 1) else None
+            return finish()
+        if verdict == "applies":
+            return finish("fork_failed_but_patch_applies_cleanly (infrastructure error)")
+        return finish("fork_failed_and_apply_check_inconclusive")
 
-    func = run_vul4py(
-        [
-            "--workspace-root", str(workspaces),
-            "--cve-id", vuln_id,
-            "functional",
-            "--target", dst_name,
-        ],
-        log,
-    )
-    # The CLI doesn't surface the inner rc cleanly; parse it from stdout.
-    func_rc = parse_rc(func.stdout, "rc=")
-    verdict["functional_rc"] = func_rc
+    v["A"] = 1
+    v["apply_ok"] = True
 
-    expl = run_vul4py(
-        [
-            "--workspace-root", str(workspaces),
-            "--cve-id", vuln_id,
-            "exploit",
-            "--targets", dst_name,
-        ],
-        log,
-    )
-    expl_rc = parse_rc(expl.stdout, "rc=")
-    verdict["exploit_rc"] = expl_rc
+    func, func_to = run_vul4py(
+        ["--workspace-root", str(workspaces), "--cve-id", vuln_id,
+         "functional", "--target", dst_name], log)
+    v["functional_rc"] = parse_rc(func.stdout, "rc=")
+    F, f_reason = classify(v["functional_rc"], func_to)
 
-    verdict["plausible"] = (
-        verdict["apply_ok"]
-        and (verdict["functional_rc"] in (0, 999))
-        and (verdict["exploit_rc"] == 0)
-    )
+    expl, expl_to = run_vul4py(
+        ["--workspace-root", str(workspaces), "--cve-id", vuln_id,
+         "exploit", "--targets", dst_name], log)
+    v["exploit_rc"] = parse_rc(expl.stdout, "rc=")
+    S, s_reason = classify(v["exploit_rc"], expl_to)
 
+    v["plausible_legacy"] = bool(
+        v["functional_rc"] in (0, 999) and v["exploit_rc"] == 0)
     cleanup_candidate(case_dir, dst_name)
-    log_path.write_text("\n".join(log) + "\n", encoding="utf-8")
-    verdict["elapsed_s"] = round(time.time() - t0, 1)
-    eval_path.write_text(json.dumps(verdict, indent=2), encoding="utf-8")
-    return verdict
 
+    v["F"], v["S"] = F, S
+    if F is None or S is None:
+        reasons = []
+        if f_reason:
+            reasons.append(f"functional:{f_reason}")
+        if s_reason:
+            reasons.append(f"exploit:{s_reason}")
+        return finish("; ".join(reasons))
 
-def parse_rc(stdout: str, marker: str) -> Optional[int]:
-    for line in stdout.splitlines():
-        if marker in line:
-            try:
-                return int(line.split(marker, 1)[1].strip().split()[0])
-            except Exception:
-                continue
-    return None
+    v["V"] = v["A"] * F * S
+    v["status"] = "complete"
+    v["FA"] = (C * (1 - v["V"])) if C in (0, 1) else None
+    return finish()
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Evaluate agent-produced patches against baseline + exploit tests.")
+    ap = argparse.ArgumentParser(description="Independently verify frozen patches.")
     ap.add_argument("--agent", required=True)
-    ap.add_argument("--vuln-id", help="Single vuln; omit to evaluate every patch found.")
+    ap.add_argument("--vuln-id")
     ap.add_argument("--workspaces", type=Path, default=WORKSPACES)
     ap.add_argument("--runs", type=Path, default=RUNS)
     ap.add_argument("--limit", type=int, default=None)
@@ -173,22 +265,16 @@ def main():
     if args.vuln_id:
         targets = [args.vuln_id]
     else:
-        targets = sorted(p.name for p in agent_dir.iterdir() if (p / "patch.diff").exists())
+        targets = sorted(p.name for p in agent_dir.iterdir() if (p / "generation.json").exists())
         if args.limit:
             targets = targets[: args.limit]
 
-    n_plaus = 0
     for vid in targets:
-        v = evaluate_one(args.workspaces, args.runs, args.agent, vid)
-        flag = "PLAUSIBLE" if v["plausible"] else "FAIL"
-        print(
-            f"  {args.agent}/{vid}: {flag} "
-            f"apply={v['apply_ok']} func_rc={v['functional_rc']} expl_rc={v['exploit_rc']} "
-            f"({v['elapsed_s']}s)"
-        )
-        if v["plausible"]:
-            n_plaus += 1
-    print(f"[done] {args.agent}: plausible {n_plaus}/{len(targets)}")
+        r = evaluate_one(args.workspaces, args.runs, args.agent, vid)
+        print(f"  {args.agent}/{vid}: status={r['status']} A={r['A']} F={r['F']} S={r['S']} "
+              f"V={r['V']} C={r['C']} FA={r['FA']} "
+              f"(func_rc={r['functional_rc']} expl_rc={r['exploit_rc']}) {r['incomplete_reason'] or ''}")
+    print(f"[done] {args.agent}: {len(targets)} evaluated")
 
 
 if __name__ == "__main__":
