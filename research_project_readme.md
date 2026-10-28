@@ -180,36 +180,7 @@ Confidence intervals are calculated using a bootstrap that resamples whole vulne
 
 The planned study follows the pipeline below, from left to right and then downward.
 
-```mermaid
-flowchart TD
-    A["1. Input: Vul4Py case<br/>Vulnerable checkout, CVE ID,<br/>files changed by the fix"]
-    B["Fixed prompt template<br/>Vulnerable source + CVE ID<br/>No fix, tests, or results"]
-    C["2. LLM request<br/>API client on Amazon EC2<br/>HTTPS, port 443"]
-    D["LLM API<br/>gpt-6-luna, Claude Fable 5.1,<br/>DeepSeek-V4-Pro"]
-    E["JSON response<br/>Patch δ, claim C, confidence P"]
-    F["3. Freeze response<br/>Save prompt, raw response,<br/>patch.diff, llm_response.json,<br/>generation.json"]
-    G["SHA-256 manifest<br/>frozen.json; files read-only<br/>No retries or manual edits"]
-    H["4. Independent verification<br/>Check SHA-256 hashes"]
-    I["Copy vulnerable checkout<br/>Apply patch → A"]
-    J{"A = 1?"}
-    K["Functional tests → F"]
-    L["Security (exploit) tests → S"]
-    M["A = 0<br/>Tests not run; F = S = 0"]
-    N["Infrastructure error, timeout,<br/>or tests cannot complete<br/>Mark incomplete"]
-    O["5. Classification<br/>V = A × F × S<br/>FA = C × (1 − V)"]
-    P["results.csv<br/>One row per attempt"]
-    Q["VRR, FAR, CR, Brier score,<br/>ECE, AUROC"]
-
-    A --> B --> C --> D --> E --> F --> G --> H --> I --> J
-    J -- Yes --> K --> L --> O
-    J -- No --> M --> O
-    K -. Cannot complete .-> N
-    N -. Excluded from valid denominator .-> P
-    O --> P --> Q
-
-    R["The model never sees<br/>verification results"]
-    R -. Isolation rule .-> D
-```
+![Architecture](261028_06h29m33s_screenshot.png)
 
 
 ## 7. Pilot Results
