@@ -162,6 +162,8 @@ $$\text{ECE} = \sum_{k=1}^{10}\frac{|B_k|}{N_P}\,\bigl|\text{conf}(B_k) - \text{
 Here, $$\text{conf}(B_k)$$ is the average confidence in bin $$\k$$, and $$\text{acc}(B_k)\$$ is the fraction of verified repairs in that bin.
 
 **Area Under the Receiver Operating Characteristic (AUROC).** AUROC measures how often a randomly selected verified repair receives higher confidence than a randomly selected unverified attempt. A value of one means perfect ordering; 0.5 corresponds to chance.
+
+
 $$\text{AUROC} = \frac{1}{n_+ n_-}\sum_{i:\,V_i=1}\ \sum_{j:\,V_j=0}\Bigl[\mathbf{1}(P_i > P_j) + \tfrac12\,\mathbf{1}(P_i = P_j)\Bigr]$$
 
 
@@ -216,7 +218,9 @@ Before conducting the full study, a pilot was run to check that the evaluation p
 
 In all five cases, the model claimed success, with confidence scores between 0.82 and 0.91. None of the repairs was verified.
 
+
 $$\text{VRR} = \frac{0}{5} = 0\% \qquad\quad \text{FAR} = \frac{5}{5} = 100\% \qquad\quad \text{CR} = \frac{5}{5}$$
+
 
 The mean API request latency was approximately 22 seconds.
 
