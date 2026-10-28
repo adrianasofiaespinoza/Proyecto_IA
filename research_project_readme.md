@@ -219,7 +219,11 @@ Before conducting the full study, a pilot was run to check that the evaluation p
 In all five cases, the model claimed success, with confidence scores between 0.82 and 0.91. None of the repairs was verified.
 
 
-$$\text{VRR} = \frac{0}{5} = 0\% \qquad\quad \text{FAR} = \frac{5}{5} = 100\% \qquad\quad \text{CR} = \frac{5}{5}$$
+$$\text{VRR} = \frac{0}{5} = 0\%$$
+
+$$\text{FAR} = \frac{5}{5} = 100\%$$ 
+
+$$\text{CR} = \frac{5}{5}$$
 
 
 The mean API request latency was approximately 22 seconds.
