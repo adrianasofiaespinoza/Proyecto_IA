@@ -90,9 +90,9 @@ During the pilot:
 
 The model must return a JSON object with three fields:
 
-1. The unified-diff patch \(\delta_i\) against the vulnerable repository files.
-2. A binary success claim \(C_i \in \{0,1\}\), where \(C_i=1\) means the model claims to have eliminated the vulnerability without breaking existing functionality, and \(C_i=0\) means it declines to claim success or abstains.
-3. A confidence score \(P_i \in [0,1]\), defined in the prompt as the model's estimated probability that the patch will pass the complete verification, independently of the value of \(C_i\).
+1. The unified-diff patch $$\delta_i\$$ against the vulnerable repository files.
+2. A binary success claim $$\(C_i \in \{0,1\}\$$, where $$\(C_i=1\$$ means the model claims to have eliminated the vulnerability without breaking existing functionality, and $$\(C_i=0\$$ means it declines to claim success or abstains.
+3. A confidence score $$\(P_i \in [0,1]\)$$, defined in the prompt as the model's estimated probability that the patch will pass the complete verification, independently of the value of $$\(C_i\)$$.
 
 ### 5.1 Per-attempt indicators
 
