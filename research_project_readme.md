@@ -1,27 +1,16 @@
 # False Assurance in LLM-Based Python Vulnerability Repair
 
-## Key Terms
-
-- **Claim (C):** The model's yes-or-no answer to “Did you fix the vulnerability?”
-- **Confidence (P):** A number between 0 and 1 that the model reports about its own response.
-- **Patch:** The code modification proposed by the model, in diff format.
-- **Oracle:** An automated test that independently determines whether something is correct.
-- **Verified repair (V):** The patch applies, preserves functionality, and makes the exploit test pass.
-- **False assurance (FA):** The model claimed success, but the repair was not verified (`V = 0`).
-
-## 1. What It Is About
+## 1. Overview
 
 Large Language Models (LLMs) are increasingly integrated into software development workflows to assist with Automated Vulnerability Repair (AVR). When asked to fix a security vulnerability, a model typically generates a code patch and may report how confident it is that the repair will succeed. Developers could rely on these claims when deciding whether a patch is ready for integration.
 
-However, a patch that looks correct does not necessarily fix the vulnerability or preserve existing functionality. This raises an important question:
+However, a patch that looks correct does not necessarily fix the vulnerability or preserve existing functionality. This raises the central question:
 
 **Can we trust a model when it says it has fixed a vulnerability?**
 
-This project investigates this question by studying *false assurance*: situations in which an LLM claims that a repair is successful, but independent verification does not support that claim.
+This project investigates **false assurance**: situations in which an LLM claims that a repair is successful, but independent verification does not support that claim.
 
-To investigate this, the study uses real Python vulnerabilities. It records the model's proposed patch, its success claim, and its self-reported confidence before independently testing the patch. Automated functional and security tests are then used to check whether the repair actually works.
-
-For example, imagine that a model generates a patch and reports a confidence score of 0.9, claiming that it has fixed the vulnerability. However, the patch might fail to apply, or it might apply successfully while the vulnerability remains exploitable. In such cases, the model's claim of success is not supported by the verification results.
+The study uses real Python vulnerabilities. The model's proposed patch, success claim, and self-reported confidence are recorded before the patch is independently tested. Automated functional and security tests then check whether the repair actually works.
 
 ## 2. Research Questions
 
@@ -37,12 +26,16 @@ The study is guided by four sub-questions:
 - **RQ4 — Failure Analysis:** Which types of failure explain the gap between what the model claims and what actually happens?
 
 ## 3. Related Work, Research Gap, and Contribution
+### Comparison of the Main Studies Reviewed
 
-Twelve studies were reviewed, and the following table presents the six closest to the research question. They fall into two groups: vulnerability repair and evaluation, and confidence calibration.
-
-The first group focuses on repair and how to evaluate it. Pearce and colleagues showed that code models can repair some security bugs, but real-world bugs were harder. Deininger and Slany compared language-model judges with actual execution and found that judges do not reliably determine whether a patch preserves program functionality. This supports evaluating patches by executing them. VulnRepairEval evaluates patches using exploits: the best of twelve models fixed five of twenty-three Python vulnerabilities. Vul4Py adds functional tests alongside exploit tests, preventing a patch that blocks an attack but breaks the program from being counted as a successful repair.
-
-The second group focuses on confidence. Xiong and colleagues studied how models express confidence and found that they tend to be overconfident on general tasks, rather than specifically on code. Siddiq and colleagues studied confidence in generated code and reported what they call *false trust*: high confidence in vulnerable code. This is the closest work to this study.
+| Ref. | Main idea | Model | Dataset | Metrics | Main result | Limitation |
+|---|---|---|---|---|---|---|
+| [1] | Zero-shot security repair | Code LLMs, e.g., Codex | Synthetic, hand-crafted, and real bugs | Repair success | Real-world bugs were harder | Older models |
+| [4] | LLM judges vs. execution | Eight LLMs | Patches in four languages | Neutralization, functionality | Judges miss functional breakage | Evaluates judges, not the model's own claim |
+| [5] | Exploit-based evaluation | 12 LLMs | 23 Python CVEs | Exploit blocked | Best result: 5 of 23 (21.7%) | Small dataset; exploit-only evaluation |
+| [6] | Paired-oracle benchmark | Six approaches | 100 vulnerabilities, 60 projects | Paired-oracle pass rate | Agents: 24–43; direct prompting: at most 5 | Model claim not measured |
+| [9] | Confidence elicitation | Five LLMs | Five task types | Calibration | Verbalized confidence is overconfident | Not code-focused |
+| [10] | Security calibration of code LLMs | Three LLMs | Security tasks | Calibration, false trust | False trust; limited repair gains | Not paired-oracle Python repair |
 
 ### Research Gap
 
@@ -63,16 +56,6 @@ The expected contribution has three parts:
 2. Two metrics: Verified Repair Rate (VRR) and False Assurance Rate (FAR).
 3. A comparison of three models, including a classification of how repairs fail.
 
-### Comparison of the Main Studies Reviewed
-
-| Ref. | Main idea | Model | Dataset | Metrics | Main result | Limitation |
-|---|---|---|---|---|---|---|
-| [1] | Zero-shot security repair | Code LLMs, e.g., Codex | Synthetic, hand-crafted, and real bugs | Repair success | Real-world bugs were harder | Older models |
-| [4] | LLM judges vs. execution | Eight LLMs | Patches in four languages | Neutralization, functionality | Judges miss functional breakage | Evaluates judges, not the model's own claim |
-| [5] | Exploit-based evaluation | 12 LLMs | 23 Python CVEs | Exploit blocked | Best result: 5 of 23 (21.7%) | Small dataset; exploit-only evaluation |
-| [6] | Paired-oracle benchmark | Six approaches | 100 vulnerabilities, 60 projects | Paired-oracle pass rate | Agents: 24–43; direct prompting: at most 5 | Model claim not measured |
-| [9] | Confidence elicitation | Five LLMs | Five task types | Calibration | Verbalized confidence is overconfident | Not code-focused |
-| [10] | Security calibration of code LLMs | Three LLMs | Security tasks | Calibration, false trust | False trust; limited repair gains | Not paired-oracle Python repair |
 
 ## 4. What Vul4Py Contains
 
@@ -99,25 +82,21 @@ During the pilot:
 - Two cases had broken infrastructure.
 - One case had a doubtful oracle.
 
-This is why the planned study includes **up to thirty cases**, rather than exactly thirty.
+
 
 ## 5. Metrics, Formulas, and Baselines
 
 ### Model Output
 
-For each attempt \(i\), the model must return a JSON object containing three fields:
+The model must return a JSON object with three fields:
 
 1. The unified-diff patch \(\delta_i\) against the vulnerable repository files.
-2. A binary success claim \(C_i \in \{0,1\}\), where \(C_i=1\) means that the model claims to have eliminated the vulnerability without breaking existing functionality, and \(C_i=0\) means it declines to claim success or abstains.
+2. A binary success claim \(C_i \in \{0,1\}\), where \(C_i=1\) means the model claims to have eliminated the vulnerability without breaking existing functionality, and \(C_i=0\) means it declines to claim success or abstains.
 3. A confidence score \(P_i \in [0,1]\), defined in the prompt as the model's estimated probability that the patch will pass the complete verification, independently of the value of \(C_i\).
 
-### 5.1. Per-Attempt Indicators
+### 5.1 Per-attempt indicators
 
-For each attempt, three binary outcomes are recorded:
-
-- \(A_i=1\) if the patch applies; otherwise, \(A_i=0\).
-- \(F_i=1\) if the patch applies and the functional tests pass; otherwise, \(F_i=0\).
-- \(S_i=1\) if the patch applies and the security tests pass; otherwise, \(S_i=0\).
+For each attempt, three binary results are recorded. \(A_i=1\) if the patch applies. \(F_i=1\) if the patch applies and the functional tests pass. \(S_i=1\) if the patch applies and the security tests pass. Each indicator is zero otherwise.
 
 \[
 A_i =
@@ -125,9 +104,7 @@ A_i =
 1 & \text{patch applies}\\
 0 & \text{otherwise}
 \end{cases}
-\]
-
-\[
+\qquad
 F_i =
 \begin{cases}
 1 & A_i=1 \text{ and functional tests pass}\\
@@ -143,7 +120,7 @@ S_i =
 \end{cases}
 \]
 
-A repair is verified only if all three indicators are one. A single zero makes the repair unverified:
+A repair is verified only when all three indicators equal one:
 
 \[
 V_i = A_i \cdot F_i \cdot S_i
@@ -152,104 +129,84 @@ V_i = A_i \cdot F_i \cdot S_i
 False assurance occurs when the model claims success (\(C_i=1\)) but the repair is not verified (\(V_i=0\)):
 
 \[
-FA_i = C_i(1-V_i)
+FA_i = C_i(1 - V_i)
 \]
 
-If the model makes no success claim, a failed repair does not count as false assurance because the model never claimed to have fixed anything.
+If the model makes no claim, a failed repair is not counted as false assurance because the model did not claim to have fixed anything.
 
-### 5.2. Valid Attempts
+### 5.2 Valid attempts
 
-Only valid attempts are counted. An attempt is excluded from the valid denominator when verification cannot be completed because of an infrastructure error.
+Only valid attempts are counted. Attempts that end because of an infrastructure error are excluded:
 
 \[
 N_{\text{valid}} = N_{\text{total}} - N_{\text{infra}}
 \]
 
-Incomplete verifications are reported separately.
+Incomplete verifications are reported separately. They are not counted as repair failures because infrastructure problems should not be attributed to the model, and they are not silently dropped.
 
-### 5.3. Main Metrics
+### 5.3 Main metrics
 
-**Verified Repair Rate (VRR)** is the proportion of valid attempts that result in verified repairs.
-
-**False Assurance Rate (FAR)** measures the proportion of success claims that are not supported by verification.
+The **Verified Repair Rate (VRR)** is the proportion of valid attempts that result in verified repairs:
 
 \[
-\text{VRR} =
-\frac{\sum_i V_i}{N_{\text{valid}}}
+\text{VRR} = \frac{\sum_i V_i}{N_{\text{valid}}}
 \]
+
+The **False Assurance Rate (FAR)** considers only attempts in which the model claimed success and measures the proportion of those claims that verification did not support:
 
 \[
-\text{FAR} =
-\frac{\sum_i C_i(1-V_i)}{\sum_i C_i}
+\text{FAR} = \frac{\sum_i C_i(1 - V_i)}{\sum_i C_i}
 \]
 
-If the model never claims success, FAR is undefined because its denominator is zero. It must not be reported as zero.
+If the model never claims success, FAR is undefined and is reported as such, never as zero.
 
-#### Example
-
-Suppose there are five valid cases:
-
-- Two repairs are verified.
-- The model claims success in four cases.
-- Two of those four claims are false.
-
-Then:
+For example, if two of five cases are verified, VRR is 40%. If the model claims success in four cases and two of those claims are false, FAR is 50%. The case in which the model makes no claim is not counted as false assurance.
 
 \[
 \text{VRR} = \frac{2}{5} = 40\%
-\]
-
-\[
+\qquad
 \text{FAR} = \frac{2}{4} = 50\%
 \]
 
-The case in which the model makes no success claim does not count as false assurance.
+### 5.4 Claim rate and baseline
 
-### 5.4. Claim Rate and Always-Claim Baseline
-
-FAR alone can be misleading. A model that rarely claims success may obtain a low FAR without necessarily being better. Therefore, the study also reports the **Claim Rate (CR)**, which measures how often the model claims success.
+FAR alone can be misleading. A model that rarely claims success can have a low FAR without being better. The **Claim Rate (CR)** measures how often the model claims that it has fixed something:
 
 \[
 \text{CR} = \frac{\sum_i C_i}{N_{\text{valid}}}
 \]
 
-The study compares the model against a simple baseline that always claims success. When the claim rate is 1, its FAR is:
+A simple baseline is a model that always claims success. Its FAR is one minus VRR, without any self-assessment:
 
 \[
-\text{FAR}_{\text{always-claim}} = 1-\text{VRR}
+\text{FAR}_{\text{always-claim}} = 1 - \text{VRR}
 \qquad (\text{when CR}=1)
 \]
 
-In the five-case example, the always-claim baseline would have a FAR of 60%, while the model's FAR is 50%. The model is only slightly better. A model whose claim carries meaningful information should perform clearly below this baseline.
+In the example above, this baseline has a FAR of 60%, compared with the model's FAR of 50%. A model whose claim carries useful information should be clearly below the baseline.
 
-The study also reports claim precision and recomputes the metrics using only patches that applied. This separates formatting failures, where the diff cannot be applied, from content failures, where the repair itself is unsuccessful.
+The study also reports claim precision and recomputes VRR and FAR using only patches that applied. This separates format failures, where the diff does not apply, from content failures, where the repair is wrong.
 
 \[
-\text{Precision} = 1-\text{FAR}
+\text{Precision} = 1 - \text{FAR}
 \]
 
 \[
 \text{FAR}_{|A=1} =
-\frac{\sum_i A_i C_i(1-V_i)}
-{\sum_i A_i C_i}
+\frac{\sum_i A_i C_i(1 - V_i)}{\sum_i A_i C_i}
 \]
 
-### 5.5. Confidence Calibration
+### 5.5 Confidence calibration
 
-Three measures are used to assess whether reported confidence aligns with verified outcomes.
+Three measures are used to assess whether confidence matches actual outcomes.
 
-#### Brier Score
-
-For each attempt, the difference between confidence and the actual result is squared and then averaged. The verified result \(V_i\) is one for a verified repair and zero otherwise. A lower Brier score is better.
+**Brier score (BS).** For each attempt, the difference between confidence and the actual result is squared, where the actual result is one for a verified repair and zero otherwise. The values are averaged; lower is better.
 
 \[
-\text{BS} =
-\frac{1}{N_P}\sum_i(P_i-V_i)^2
+\text{BS} = \frac{1}{N_P}\sum_i (P_i - V_i)^2
 \]
 
-#### Expected Calibration Error (ECE)
-
-Attempts are grouped into ten bins according to confidence. For each bin, the average confidence is compared with the actual proportion of verified repairs. The differences are weighted by the number of attempts in each bin.
+**Expected Calibration Error (ECE).** Attempts are grouped into ten bins according to confidence. For each bin, the average confidence is compared with the actual fraction of verified repairs. The gaps are averaged, weighted by the number of attempts in each bin.
 
 \[
 \text{ECE} =
@@ -258,59 +215,32 @@ Attempts are grouped into ten bins according to confidence. For each bin, the av
 \left|\text{conf}(B_k)-\text{acc}(B_k)\right|
 \]
 
-Here, \(\text{conf}(B_k)\) is the average confidence in bin \(k\), and \(\text{acc}(B_k)\) is the proportion of verified repairs in that bin.
+Here, \(\text{conf}(B_k)\) is the average confidence in bin \(k\), and \(\text{acc}(B_k)\) is the fraction of verified repairs in that bin.
 
-#### Area Under the Receiver Operating Characteristic Curve (AUROC)
-
-AUROC measures how often a randomly selected verified repair receives a higher confidence score than a randomly selected unverified attempt. A value of 1 indicates perfect ranking, while 0.5 corresponds to chance.
+**Area Under the Receiver Operating Characteristic (AUROC).** AUROC measures how often a randomly selected verified repair receives higher confidence than a randomly selected unverified attempt. A value of one means perfect ordering; 0.5 corresponds to chance.
 
 \[
 \text{AUROC} =
 \frac{1}{n_+n_-}
-\sum_{i:V_i=1}\sum_{j:V_j=0}
+\sum_{i:V_i=1}
+\sum_{j:V_j=0}
 \left[
 \mathbf{1}(P_i>P_j)
 +\frac{1}{2}\mathbf{1}(P_i=P_j)
 \right]
 \]
 
-#### Calibration Example
+For an example with four attempts—confidence 0.9 with a verified repair, 0.9 with an unverified repair, 0.6 with a verified repair, and 0.3 with an unverified repair—the Brier score is approximately 0.27, ECE is 0.375, and AUROC is 0.625. AUROC cannot be computed if there are no verified repairs to compare with unverified attempts.
 
-Consider four attempts:
+### 5.6 Latency and confidence intervals
 
-| Confidence | Verified result |
-|---:|---:|
-| 0.9 | Verified |
-| 0.9 | Not verified |
-| 0.6 | Verified |
-| 0.3 | Not verified |
-
-The reported example gives:
-
-- Brier score: approximately 0.27.
-- ECE: 0.375.
-- AUROC: 0.625.
-
-For ECE, the bin around confidence 0.9 has an average confidence of 90% but an observed success rate of 50%. For AUROC, among the four verified-versus-unverified pairs, one is a tie, one is in the wrong order, and two are in the right order.
-
-### 5.6. Latency and Confidence Intervals
-
-The latency of every API call is recorded:
+The latency of each API call is recorded:
 
 \[
-L_i =
-1000\left(t_i^{\text{response}}-t_i^{\text{request}}\right)
-\text{ ms}
+L_i = 1000\left(t_i^{\text{response}}-t_i^{\text{request}}\right)\ \text{ms}
 \]
 
-Confidence intervals are computed using bootstrap resampling of whole vulnerabilities because repeated attempts on the same vulnerability are not independent.
-
-### 5.7. Baselines Summary
-
-The study uses two baselines:
-
-1. **VRR reference:** The direct-prompting result reported in the Vul4Py paper, which is at most five out of one hundred. This is a reference point rather than a direct comparison because the models used in this study differ from those in the original work.
-2. **FAR baseline:** A model that always claims success, for which \(\text{FAR}=1-\text{VRR}\) when \(\text{CR}=1\).
+Confidence intervals are calculated using a bootstrap that resamples whole vulnerabilities, because repeated attempts on the same vulnerability are not independent.
 
 ## 6. Methodology and Evaluation Pipeline
 
@@ -347,39 +277,6 @@ flowchart TD
     R -. Isolation rule .-> D
 ```
 
-### Block 1: Input
-
-A Vul4Py case is selected and a fixed prompt is constructed. The prompt contains the vulnerable source code and the vulnerability identifier. It does not contain the fix, tests, or results. The same prompt template is used for every model.
-
-### Block 2: Request
-
-A program running on a cloud server on Amazon EC2 sends the prompt to the model's API over HTTPS. The model returns a JSON object containing the patch, the yes-or-no claim, and the confidence score.
-
-### Block 3: Response Freezing
-
-Before any verification, the complete model response is saved. A SHA-256 hash is calculated for each file, and the files are set to read-only. There are no retries or manual edits. This makes it possible to demonstrate that the claim is exactly what the model originally returned and was not adjusted after seeing the results.
-
-### Block 4: Independent Verification
-
-First, the hashes are checked. The vulnerable code is then copied, and the patch is applied. Whether it applies is recorded.
-
-If the patch applies, the functional tests and then the security tests are run on the same patched copy.
-
-If the patch does not apply, the tests are not run, and both test indicators are zero.
-
-If something outside the patch prevents verification, such as a timeout or an environment error, the attempt is marked *incomplete* and excluded from the valid denominator. This avoids distorting the results.
-
-### Block 5: Classification and Metrics
-
-The three verification results determine whether the repair is verified. False assurance is calculated, each failed attempt is classified, and the metrics are computed.
-
-The red arrow in the original architecture diagram represents the isolation rule: **the model never sees the verification results**.
-
-### Why These Decisions Matter
-
-- **Freezing the output** makes the independence of the evaluation auditable because the claim can be checked against the original response.
-- **Using two types of tests** is necessary because an exploit test alone cannot detect a patch that breaks the program.
-- **Separating incomplete verifications** avoids blaming the model for infrastructure problems while also ensuring those cases are not silently hidden.
 
 ## 7. Pilot Results
 
