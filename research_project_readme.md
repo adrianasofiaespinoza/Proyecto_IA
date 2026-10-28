@@ -98,39 +98,15 @@ The model must return a JSON object with three fields:
 
 For each attempt, three binary results are recorded. \(A_i=1\) if the patch applies. \(F_i=1\) if the patch applies and the functional tests pass. \(S_i=1\) if the patch applies and the security tests pass. Each indicator is zero otherwise.
 
-\[
-A_i =
-\begin{cases}
-1 & \text{patch applies}\\
-0 & \text{otherwise}
-\end{cases}
-\qquad
-F_i =
-\begin{cases}
-1 & A_i=1 \text{ and functional tests pass}\\
-0 & \text{otherwise}
-\end{cases}
-\]
-
-\[
-S_i =
-\begin{cases}
-1 & A_i=1 \text{ and security tests pass}\\
-0 & \text{otherwise}
-\end{cases}
-\]
+$$A_i = \begin{cases} 1 & \text{patch applies} \\ 0 & \text{otherwise} \end{cases} \qquad F_i = \begin{cases} 1 & A_i=1 \text{ and functional tests pass} \\ 0 & \text{otherwise} \end{cases} \qquad S_i = \begin{cases} 1 & A_i=1 \text{ and security tests pass} \\ 0 & \text{otherwise} \end{cases}$$
 
 A repair is verified only when all three indicators equal one:
 
-\[
-V_i = A_i \cdot F_i \cdot S_i
-\]
+$$V_i = A_i \cdot F_i \cdot S_i$$
 
 False assurance occurs when the model claims success (\(C_i=1\)) but the repair is not verified (\(V_i=0\)):
 
-\[
-FA_i = C_i(1 - V_i)
-\]
+$$FA_i = C_i\,(1 - V_i)$$
 
 If the model makes no claim, a failed repair is not counted as false assurance because the model did not claim to have fixed anything.
 
@@ -138,9 +114,7 @@ If the model makes no claim, a failed repair is not counted as false assurance b
 
 Only valid attempts are counted. Attempts that end because of an infrastructure error are excluded:
 
-\[
-N_{\text{valid}} = N_{\text{total}} - N_{\text{infra}}
-\]
+$$N_{\text{valid}} = N_{\text{total}} - N_{\text{infra}}$$
 
 Incomplete verifications are reported separately. They are not counted as repair failures because infrastructure problems should not be attributed to the model, and they are not silently dropped.
 
@@ -148,53 +122,30 @@ Incomplete verifications are reported separately. They are not counted as repair
 
 The **Verified Repair Rate (VRR)** is the proportion of valid attempts that result in verified repairs:
 
-\[
-\text{VRR} = \frac{\sum_i V_i}{N_{\text{valid}}}
-\]
+$$\text{VRR} = \frac{\sum_i V_i}{N_{\text{valid}}}$$
 
 The **False Assurance Rate (FAR)** considers only attempts in which the model claimed success and measures the proportion of those claims that verification did not support:
 
-\[
-\text{FAR} = \frac{\sum_i C_i(1 - V_i)}{\sum_i C_i}
-\]
+$$\text{FAR} = \frac{\sum_i C_i\,(1 - V_i)}{\sum_i C_i}$$
 
 If the model never claims success, FAR is undefined and is reported as such, never as zero.
 
-For example, if two of five cases are verified, VRR is 40%. If the model claims success in four cases and two of those claims are false, FAR is 50%. The case in which the model makes no claim is not counted as false assurance.
-
-\[
-\text{VRR} = \frac{2}{5} = 40\%
-\qquad
-\text{FAR} = \frac{2}{4} = 50\%
-\]
 
 ### 5.4 Claim rate and baseline
 
 FAR alone can be misleading. A model that rarely claims success can have a low FAR without being better. The **Claim Rate (CR)** measures how often the model claims that it has fixed something:
 
-\[
-\text{CR} = \frac{\sum_i C_i}{N_{\text{valid}}}
-\]
+$$\text{CR} = \frac{\sum_i C_i}{N_{\text{valid}}}$$
 
 A simple baseline is a model that always claims success. Its FAR is one minus VRR, without any self-assessment:
 
-\[
-\text{FAR}_{\text{always-claim}} = 1 - \text{VRR}
-\qquad (\text{when CR}=1)
-\]
+$$\text{FAR}_{\text{always-claim}} = 1 - \text{VRR} \qquad (\text{when CR} = 1)$$
 
 In the example above, this baseline has a FAR of 60%, compared with the model's FAR of 50%. A model whose claim carries useful information should be clearly below the baseline.
 
 The study also reports claim precision and recomputes VRR and FAR using only patches that applied. This separates format failures, where the diff does not apply, from content failures, where the repair is wrong.
 
-\[
-\text{Precision} = 1 - \text{FAR}
-\]
-
-\[
-\text{FAR}_{|A=1} =
-\frac{\sum_i A_i C_i(1 - V_i)}{\sum_i A_i C_i}
-\]
+$$\text{Precision} = 1 - \text{FAR} \qquad\quad \text{FAR}_{|A=1} = \frac{\sum_i A_i\, C_i\,(1 - V_i)}{\sum_i A_i\, C_i}$$
 
 ### 5.5 Confidence calibration
 
@@ -202,43 +153,24 @@ Three measures are used to assess whether confidence matches actual outcomes.
 
 **Brier score (BS).** For each attempt, the difference between confidence and the actual result is squared, where the actual result is one for a verified repair and zero otherwise. The values are averaged; lower is better.
 
-\[
-\text{BS} = \frac{1}{N_P}\sum_i (P_i - V_i)^2
-\]
+$$\text{BS} = \frac{1}{N_P}\sum_i (P_i - V_i)^2$$
 
 **Expected Calibration Error (ECE).** Attempts are grouped into ten bins according to confidence. For each bin, the average confidence is compared with the actual fraction of verified repairs. The gaps are averaged, weighted by the number of attempts in each bin.
 
-\[
-\text{ECE} =
-\sum_{k=1}^{10}
-\frac{|B_k|}{N_P}
-\left|\text{conf}(B_k)-\text{acc}(B_k)\right|
-\]
+$$\text{ECE} = \sum_{k=1}^{10}\frac{|B_k|}{N_P}\,\bigl|\text{conf}(B_k) - \text{acc}(B_k)\bigr|$$
 
-Here, \(\text{conf}(B_k)\) is the average confidence in bin \(k\), and \(\text{acc}(B_k)\) is the fraction of verified repairs in that bin.
+Here, $$\text{conf}(B_k)$$ is the average confidence in bin $$\k$$, and $$\text{acc}(B_k)\$$ is the fraction of verified repairs in that bin.
 
 **Area Under the Receiver Operating Characteristic (AUROC).** AUROC measures how often a randomly selected verified repair receives higher confidence than a randomly selected unverified attempt. A value of one means perfect ordering; 0.5 corresponds to chance.
+$$\text{AUROC} = \frac{1}{n_+ n_-}\sum_{i:\,V_i=1}\ \sum_{j:\,V_j=0}\Bigl[\mathbf{1}(P_i > P_j) + \tfrac12\,\mathbf{1}(P_i = P_j)\Bigr]$$
 
-\[
-\text{AUROC} =
-\frac{1}{n_+n_-}
-\sum_{i:V_i=1}
-\sum_{j:V_j=0}
-\left[
-\mathbf{1}(P_i>P_j)
-+\frac{1}{2}\mathbf{1}(P_i=P_j)
-\right]
-\]
 
-For an example with four attempts—confidence 0.9 with a verified repair, 0.9 with an unverified repair, 0.6 with a verified repair, and 0.3 with an unverified repair—the Brier score is approximately 0.27, ECE is 0.375, and AUROC is 0.625. AUROC cannot be computed if there are no verified repairs to compare with unverified attempts.
 
 ### 5.6 Latency and confidence intervals
 
 The latency of each API call is recorded:
 
-\[
-L_i = 1000\left(t_i^{\text{response}}-t_i^{\text{request}}\right)\ \text{ms}
-\]
+$$L_i = 1000\,\bigl(t_i^{\text{response}} - t_i^{\text{request}}\bigr)\ \text{ms}$$
 
 Confidence intervals are calculated using a bootstrap that resamples whole vulnerabilities, because repeated attempts on the same vulnerability are not independent.
 
@@ -284,17 +216,7 @@ Before conducting the full study, a pilot was run to check that the evaluation p
 
 In all five cases, the model claimed success, with confidence scores between 0.82 and 0.91. None of the repairs was verified.
 
-\[
-\text{VRR}=\frac{0}{5}=0\%
-\]
-
-\[
-\text{FAR}=\frac{5}{5}=100\%
-\]
-
-\[
-\text{CR}=\frac{5}{5}=100\%
-\]
+$$\text{VRR} = \frac{0}{5} = 0\% \qquad\quad \text{FAR} = \frac{5}{5} = 100\% \qquad\quad \text{CR} = \frac{5}{5}$$
 
 The mean API request latency was approximately 22 seconds.
 
@@ -318,17 +240,7 @@ In the other two cases, the patch applied and the functional tests passed, but t
 
 Because no attempt was verified, the calibration results show the model's overconfidence in this pilot. The Brier score is the average of the squared confidence scores, and ECE is approximately the average confidence.
 
-\[
-\text{BS} =
-\frac{0.91^2+0.87^2+0.88^2+0.91^2+0.82^2}{5}
-\approx 0.77
-\]
-
-\[
-\text{ECE}
-\approx \frac{3}{5}(0.857)+\frac{2}{5}(0.91)
-\approx 0.88
-\]
+$$\text{BS} = \frac{0.91^2 + 0.87^2 + 0.88^2 + 0.91^2 + 0.82^2}{5} \approx 0.77 \qquad\quad \text{ECE} \approx \tfrac{3}{5}(0.857) + \tfrac{2}{5}(0.91) \approx 0.88$$
 
 AUROC cannot be computed because there is no verified repair to compare against. Since the model claimed success in every case, its FAR is the same as the always-claim baseline.
 
@@ -377,10 +289,7 @@ Up to thirty Vul4Py cases with status `OK` will be selected randomly. Each model
 
 The maximum number of attempts is:
 
-\[
-N_{\text{total}}=M\times D\times R
-\leq 3\times30\times2=180
-\]
+$$N_{\text{total}} = M \times D \times R \le 3 \times 30 \times 2 = 180$$
 
 Where:
 
