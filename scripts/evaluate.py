@@ -33,6 +33,33 @@ evaluation. Before every evaluation both trees are therefore:
 If any check fails the observation is incomplete ("workspace_restore_failed").
 What was found and done is recorded in eval.json["workspace_restore"].
 
+Test logs as evidence
+---------------------
+vul4py.py writes its logs to <case>/logs/ (not inside the candidate), with
+fixed names per candidate, so they would be overwritten by the next attempt.
+Stale candidate logs are deleted before each attempt, and every log written
+during the attempt (functional/exploit .log and .junit.xml, patch, setup,
+bootstrap) is copied to <out>/test_logs/ with its SHA-256 in eval.json.
+
+Interpretation of test outcomes (classify_step)
+-----------------------------------------------
+vul4py prints "rc=<n>" with pytest's exit code, 999 for "no tests defined",
+and 124 when its own per-run timeout (VUL4PY_TEST_TIMEOUT, default 900 s)
+kills the process group. Every rc is cross-checked against the junit XML that
+pytest writes for the same run:
+  rc 0   -> pass (1) only if junit exists, 0 failures/errors and >=1 passed;
+            all tests skipped -> incomplete; anything else -> incomplete.
+  rc 1   -> fail (0) only if junit shows >=1 failure/error; else incomplete.
+  rc 2   -> (interrupted / collection error) fail (0) only if the error text
+            names a file modified by the patch, i.e. the patch broke import or
+            collection; otherwise incomplete.
+  rc 3,4 -> incomplete (pytest internal / usage error).
+  rc 5, 999 -> incomplete (no tests).
+  rc 124 or evaluator step timeout -> incomplete (timeout).
+  rc < 0 or >= 128 -> incomplete (killed by a signal / runner error).
+  no "rc=" line (e.g. installation failed) -> incomplete.
+Details per step are recorded in eval.json["functional"] / ["exploit"].
+
 The LLM never receives any of these results.
 """
 from __future__ import annotations
@@ -47,6 +74,7 @@ import subprocess
 import sys
 import time
 import traceback
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -56,12 +84,12 @@ WORKSPACES = HERE / "workspaces"
 RUNS = HERE / "runs"
 VUL4PY = Path(__file__).resolve().parent / "vul4py.py"
 
-EVALUATOR_VERSION = "9f54a0f+workspace-restore"
+EVALUATOR_VERSION = "9f54a0f+workspace-restore+test-logs+junit-rc"
 
-# Return-code interpretation (ASSUMPTION: pytest-style codes).
-# Adjust after reading vul4py.py if needed.
-FAIL_RCS = {1, 2}        # tests ran and failed, or collection broke after patching
-NO_TEST_RCS = {5, 999}   # no tests collected -> NOT a passed oracle
+# Return codes as produced by vul4py.py (see module docstring).
+NO_TEST_RCS = {5, 999}         # pytest "no tests collected" / vul4py "no tests defined"
+PYTEST_ERROR_RCS = {3: "pytest_internal_error", 4: "pytest_usage_error"}
+VUL4PY_TIMEOUT_RC = 124        # run_in_venv() kills the process group and returns 124
 STEP_TIMEOUT_S = 1800
 GIT_TIMEOUT_S = 600
 
@@ -111,19 +139,145 @@ def parse_rc(stdout: str, marker: str) -> Optional[int]:
     return None
 
 
-def classify(rc: Optional[int], timed_out: bool):
-    """Return (passed 1/0 or None, incomplete_reason or None)."""
-    if timed_out:
-        return None, "timeout"
+def parse_junit(path: Path) -> Optional[Dict]:
+    """Counts and failing cases from a pytest --junitxml file; None if absent
+    or malformed. '_text' (not stored) holds the failure/error messages."""
+    if not path.exists():
+        return None
+    try:
+        root = ET.parse(path).getroot()
+    except ET.ParseError:
+        return None
+    suites = [root] if root.tag == "testsuite" else root.findall("testsuite")
+    res = {"tests": 0, "failed": 0, "errored": 0, "skipped": 0}
+    cases: List[Dict] = []
+    texts: List[str] = []
+    for s in suites:
+        res["tests"] += int(s.get("tests", 0) or 0)
+        res["failed"] += int(s.get("failures", 0) or 0)
+        res["errored"] += int(s.get("errors", 0) or 0)
+        res["skipped"] += int(s.get("skipped", 0) or 0)
+        for c in s.iter("testcase"):
+            for tag in ("failure", "error"):
+                el = c.find(tag)
+                if el is None:
+                    continue
+                msg = el.get("message") or ""
+                cases.append({"kind": tag, "classname": c.get("classname", ""),
+                              "name": c.get("name", ""), "file": c.get("file", ""),
+                              "message": msg[:500]})
+                texts.append(msg + "\n" + (el.text or ""))
+    res["passed"] = max(0, res["tests"] - res["failed"] - res["errored"] - res["skipped"])
+    res["failed_cases"] = cases[:100]
+    res["_text"] = "\n".join(texts)
+    return res
+
+
+def patched_files(patch: Path) -> List[str]:
+    """Repository-relative paths named in the ---/+++ headers of a unified diff."""
+    out: List[str] = []
+    try:
+        lines = patch.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return out
+    for line in lines:
+        if line.startswith(("--- ", "+++ ")):
+            p = line[4:].split("\t", 1)[0].strip()
+            if p == "/dev/null":
+                continue
+            if p.startswith(("a/", "b/")):
+                p = p[2:]
+            if p and p not in out:
+                out.append(p)
+    return out
+
+
+def classify_step(rc: Optional[int], timed_out: bool, junit: Optional[Dict],
+                  error_text: str, touched: List[str]) -> Tuple[Optional[int], Optional[str], str]:
+    """Return (1/0/None, incomplete_reason or None, outcome label).
+    See the module docstring for the rules."""
+    if timed_out or rc == VUL4PY_TIMEOUT_RC:
+        return None, "timeout", "timeout"
     if rc is None:
-        return None, "rc_not_parsed"
-    if rc == 0:
-        return 1, None
+        return None, "rc_not_parsed", "rc_not_parsed"
     if rc in NO_TEST_RCS:
-        return None, "no_tests"
-    if rc in FAIL_RCS:
-        return 0, None
-    return None, f"infra_error_rc_{rc}"
+        return None, "no_tests", "no_tests"
+    if rc in PYTEST_ERROR_RCS:
+        return None, PYTEST_ERROR_RCS[rc], PYTEST_ERROR_RCS[rc]
+    if rc < 0 or rc >= 128:
+        return None, f"killed_or_runner_error_rc_{rc}", "killed_or_runner_error"
+    if rc == 0:
+        if junit is None:
+            return None, "junit_missing_rc_0", "junit_missing"
+        if junit["failed"] or junit["errored"]:
+            return None, "rc_junit_inconsistent_rc_0", "inconsistent"
+        if junit["passed"] < 1:
+            return None, "all_tests_skipped", "all_tests_skipped"
+        return 1, None, "pass"
+    if rc == 1:
+        if junit is None:
+            return None, "junit_missing_rc_1", "junit_missing"
+        if junit["failed"] + junit["errored"] < 1:
+            return None, "rc_junit_inconsistent_rc_1", "inconsistent"
+        return 0, None, "tests_failed"
+    if rc == 2:
+        if any(t and t in error_text for t in touched):
+            return 0, None, "collection_error_in_patched_code"
+        return None, "collection_error_unattributed", "collection_error_unattributed"
+    return None, f"unexpected_rc_{rc}", "unexpected_rc"
+
+
+def run_test_step(kind: str, workspaces: Path, vuln_id: str, dst_name: str,
+                  logs_dir: Path, touched: List[str], log: list) -> Dict:
+    """Run vul4py functional/exploit on the candidate and interpret the result."""
+    if kind == "functional":
+        args = ["functional", "--target", dst_name]
+        stem = f"functional_{dst_name}"
+    else:
+        args = ["exploit", "--targets", dst_name]
+        stem = f"exploit_{dst_name}"
+    cp, timed_out = run_vul4py(
+        ["--workspace-root", str(workspaces), "--cve-id", vuln_id] + args, log)
+    rc = parse_rc(cp.stdout, "rc=")
+    junit = parse_junit(logs_dir / f"{stem}.junit.xml")
+    step_log = logs_dir / f"{stem}.log"
+    error_text = (junit or {}).get("_text", "")
+    if step_log.exists():
+        error_text += "\n" + step_log.read_text(encoding="utf-8", errors="replace")
+    value, reason, outcome = classify_step(rc, timed_out, junit, error_text, touched)
+    if junit is not None:
+        junit = {k: val for k, val in junit.items() if k != "_text"}
+    return {"rc": rc, "process_exit": cp.returncode, "timed_out": timed_out,
+            "junit": junit, "value": value, "outcome": outcome,
+            "incomplete_reason": reason}
+
+
+# ---------- test logs as evidence ----------
+
+def purge_candidate_logs(logs_dir: Path, dst_name: str, log: list):
+    """Delete logs left by a previous attempt with the same candidate name."""
+    if not logs_dir.exists():
+        return
+    for p in logs_dir.iterdir():
+        if p.is_file() and (f"_{dst_name}." in p.name or f"_{dst_name}_" in p.name):
+            p.unlink()
+            log.append(f"[logs] removed stale {p.name}")
+
+
+def collect_test_logs(logs_dir: Path, since: float, dest: Path) -> Dict[str, str]:
+    """Copy every log written since `since` into dest; return {name: sha256}."""
+    hashes: Dict[str, str] = {}
+    if not logs_dir.exists():
+        return hashes
+    if dest.exists():
+        # Only possible after an attempt that crashed before writing eval.json.
+        shutil.rmtree(dest)
+    for p in sorted(logs_dir.iterdir()):
+        if p.is_file() and p.stat().st_mtime >= since:
+            dest.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(p, dest / p.name)
+            hashes[p.name] = hashlib.sha256((dest / p.name).read_bytes()).hexdigest()
+    return hashes
 
 
 def check_frozen(run_dir: Path):
@@ -321,6 +475,10 @@ def _evaluate_in_case(v: dict, case_dir: Path, meta: dict, run_dir: Path,
 
     dst_name = f"{agent}_candidate"
     cleanup_candidate(case_dir, dst_name)
+    logs_dir = case_dir / "logs"
+    purge_candidate_logs(logs_dir, dst_name, log)
+    touched = patched_files(patch)
+    v["patched_files"] = touched
 
     fork, fork_to = run_vul4py(
         ["--workspace-root", str(workspaces), "--cve-id", vuln_id,
@@ -347,18 +505,16 @@ def _evaluate_in_case(v: dict, case_dir: Path, meta: dict, run_dir: Path,
 
     v["A"] = 1
     v["apply_ok"] = True
+    # vul4py falls back to `patch` (which tolerates offsets/fuzz) when
+    # `git apply` fails. A stays 1 either way; the method is recorded.
+    strict = git_apply_check(case_dir / "vulnerable", patch, log)
+    v["apply_method"] = "git_apply" if strict == "applies" else "patch_fallback"
 
-    func, func_to = run_vul4py(
-        ["--workspace-root", str(workspaces), "--cve-id", vuln_id,
-         "functional", "--target", dst_name], log)
-    v["functional_rc"] = parse_rc(func.stdout, "rc=")
-    F, f_reason = classify(v["functional_rc"], func_to)
-
-    expl, expl_to = run_vul4py(
-        ["--workspace-root", str(workspaces), "--cve-id", vuln_id,
-         "exploit", "--targets", dst_name], log)
-    v["exploit_rc"] = parse_rc(expl.stdout, "rc=")
-    S, s_reason = classify(v["exploit_rc"], expl_to)
+    func = run_test_step("functional", workspaces, vuln_id, dst_name, logs_dir, touched, log)
+    expl = run_test_step("exploit", workspaces, vuln_id, dst_name, logs_dir, touched, log)
+    v["functional"], v["exploit"] = func, expl
+    v["functional_rc"], v["exploit_rc"] = func["rc"], expl["rc"]
+    F, S = func["value"], expl["value"]
 
     v["plausible_legacy"] = bool(
         v["functional_rc"] in (0, 999) and v["exploit_rc"] == 0)
@@ -366,10 +522,10 @@ def _evaluate_in_case(v: dict, case_dir: Path, meta: dict, run_dir: Path,
     v["F"], v["S"] = F, S
     if F is None or S is None:
         reasons = []
-        if f_reason:
-            reasons.append(f"functional:{f_reason}")
-        if s_reason:
-            reasons.append(f"exploit:{s_reason}")
+        if func["incomplete_reason"]:
+            reasons.append(f"functional:{func['incomplete_reason']}")
+        if expl["incomplete_reason"]:
+            reasons.append(f"exploit:{expl['incomplete_reason']}")
         return "; ".join(reasons)
 
     v["V"] = v["A"] * F * S
@@ -407,9 +563,12 @@ def evaluate_one(workspaces: Path, runs: Path, agent: str, vuln_id: str,
         "C": C, "P": P,
         "A": None, "F": None, "S": None, "V": None, "FA": None,
         "status": "incomplete", "incomplete_reason": None,
-        "apply_ok": False, "functional_rc": None, "exploit_rc": None,
+        "apply_ok": False, "apply_method": None, "patched_files": None,
+        "functional_rc": None, "exploit_rc": None,
+        "functional": None, "exploit": None,
         "plausible_legacy": False,
         "workspace_restore": {"before_eval": None, "after_eval": None},
+        "test_logs_dir": None, "test_logs_sha256": None, "test_logs_error": None,
         "elapsed_s": None, "notes": "",
         "_gen_status": gen.get("status"),
     }
@@ -429,6 +588,7 @@ def evaluate_one(workspaces: Path, runs: Path, agent: str, vuln_id: str,
         meta = json.loads((case_dir / "meta.json").read_text(encoding="utf-8"))
         dst_name = f"{agent}_candidate"
         with case_lock(case_dir):
+            t_case = time.time()
             try:
                 reason = _evaluate_in_case(v, case_dir, meta, run_dir, workspaces,
                                            agent, vuln_id, log)
@@ -437,6 +597,15 @@ def evaluate_one(workspaces: Path, runs: Path, agent: str, vuln_id: str,
                 log.append(traceback.format_exc())
                 reason = f"evaluator_exception: {e!r}"
             finally:
+                # Keep the test logs as evidence before anything else is touched.
+                try:
+                    hashes = collect_test_logs(case_dir / "logs", t_case,
+                                               out_dir / "test_logs")
+                    v["test_logs_dir"] = str(out_dir / "test_logs") if hashes else None
+                    v["test_logs_sha256"] = hashes
+                except Exception as e:
+                    v["test_logs_error"] = repr(e)
+                    log.append(f"[test-logs error] {e!r}")
                 cleanup_candidate(case_dir, dst_name)
                 # Leave the case clean for the next attempt. Operational only:
                 # it never changes the verdict of this attempt.

@@ -1,0 +1,58 @@
+{
+  "generated_at_utc": "2026-11-24T13:18:42.939723+00:00",
+  "evaluator_version": "9f54a0f+workspace-restore+test-logs+junit-rc",
+  "scan_check": {
+    "runs": 72,
+    "known": 20,
+    "match": 20,
+    "outcomes": {
+      "tests_failed": 14,
+      "pass": 19,
+      "collection_error_unattributed": 32,
+      "pytest_usage_error": 4,
+      "killed_or_runner_error": 3
+    }
+  },
+  "controls": {
+    "n": 15,
+    "match": 13,
+    "mismatches": [
+      {
+        "cve_id": "CVE-2022-3102",
+        "control": "reference_fix",
+        "status": "complete",
+        "incomplete_reason": null,
+        "obs_A": 1,
+        "obs_F": 0,
+        "obs_S": 1,
+        "obs_V": 0,
+        "exp_A": 1,
+        "exp_F": 1,
+        "exp_S": 1,
+        "exp_V": 1,
+        "functional_outcome": "tests_failed",
+        "exploit_outcome": "pass",
+        "apply_method": "git_apply",
+        "match": false
+      },
+      {
+        "cve_id": "CVE-2023-47163",
+        "control": "reference_fix",
+        "status": "complete",
+        "incomplete_reason": null,
+        "obs_A": 1,
+        "obs_F": 1,
+        "obs_S": 0,
+        "obs_V": 0,
+        "exp_A": 1,
+        "exp_F": 1,
+        "exp_S": 1,
+        "exp_V": 1,
+        "functional_outcome": "pass",
+        "exploit_outcome": "tests_failed",
+        "apply_method": "git_apply",
+        "match": false
+      }
+    ]
+  }
+}

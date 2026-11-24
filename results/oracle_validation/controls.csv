@@ -1,0 +1,16 @@
+cve_id,control,status,incomplete_reason,obs_A,obs_F,obs_S,obs_V,exp_A,exp_F,exp_S,exp_V,functional_outcome,exploit_outcome,apply_method,match
+CVE-2022-3102,reference_fix,complete,,1,0,1,0,1,1,1,1,tests_failed,pass,git_apply,False
+CVE-2022-3102,noop,complete,,1,1,0,0,1,1,0,0,pass,tests_failed,git_apply,True
+CVE-2022-3102,corrupt,complete,,0,0,0,0,0,0,0,0,,,,True
+CVE-2023-47163,reference_fix,complete,,1,1,0,0,1,1,1,1,pass,tests_failed,git_apply,False
+CVE-2023-47163,noop,complete,,1,1,0,0,1,1,0,0,pass,tests_failed,git_apply,True
+CVE-2023-47163,corrupt,complete,,0,0,0,0,0,0,0,0,,,,True
+CVE-2023-6681,reference_fix,complete,,1,1,1,1,1,1,1,1,pass,pass,git_apply,True
+CVE-2023-6681,noop,complete,,1,1,0,0,1,1,0,0,pass,tests_failed,git_apply,True
+CVE-2023-6681,corrupt,complete,,0,0,0,0,0,0,0,0,,,,True
+CVE-2025-43859,reference_fix,complete,,1,1,1,1,1,1,1,1,pass,pass,git_apply,True
+CVE-2025-43859,noop,complete,,1,1,0,0,1,1,0,0,pass,tests_failed,git_apply,True
+CVE-2025-43859,corrupt,complete,,0,0,0,0,0,0,0,0,,,,True
+CVE-2025-46656,reference_fix,complete,,1,1,1,1,1,1,1,1,pass,pass,git_apply,True
+CVE-2025-46656,noop,complete,,1,1,0,0,1,1,0,0,pass,tests_failed,git_apply,True
+CVE-2025-46656,corrupt,complete,,0,0,0,0,0,0,0,0,,,,True
