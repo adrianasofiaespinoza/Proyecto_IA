@@ -84,12 +84,16 @@ WORKSPACES = HERE / "workspaces"
 RUNS = HERE / "runs"
 VUL4PY = Path(__file__).resolve().parent / "vul4py.py"
 
-EVALUATOR_VERSION = "9f54a0f+workspace-restore+test-logs+junit-rc"
+EVALUATOR_VERSION = "9f54a0f+workspace-restore+test-logs+junit-rc+generation-status-reps"
 
 # Return codes as produced by vul4py.py (see module docstring).
 NO_TEST_RCS = {5, 999}         # pytest "no tests collected" / vul4py "no tests defined"
 PYTEST_ERROR_RCS = {3: "pytest_internal_error", 4: "pytest_usage_error"}
 VUL4PY_TIMEOUT_RC = 124        # run_in_venv() kills the process group and returns 124
+
+# generation.json "status" values written by run_agent.py
+NO_ANSWER_STATUSES = {"parse_error", "refusal", "truncated"}   # failed repair, C=0
+INFRA_GENERATION_STATUSES = {"api_error_exhausted"}            # incomplete (infra)
 STEP_TIMEOUT_S = 1800
 GIT_TIMEOUT_S = 600
 
@@ -534,13 +538,20 @@ def _evaluate_in_case(v: dict, case_dir: Path, meta: dict, run_dir: Path,
     return None
 
 
+def attempt_rel(agent: str, vuln_id: str, rep: Optional[int]) -> Path:
+    """<agent>/<vuln_id>/rep<k> (full study) or <agent>/<vuln_id> (pilot layout)."""
+    rel = Path(agent) / vuln_id
+    return rel / f"rep{rep}" if rep else rel
+
+
 def evaluate_one(workspaces: Path, runs: Path, agent: str, vuln_id: str,
-                 out_root: Optional[Path] = None) -> Optional[dict]:
+                 out_root: Optional[Path] = None, rep: Optional[int] = None) -> Optional[dict]:
     """Evaluate one frozen attempt. Returns the verdict, or None if skipped
     because an evaluation already exists at the destination."""
     case_dir = workspaces / vuln_id
-    run_dir = runs / agent / vuln_id
-    out_dir = (out_root / agent / vuln_id) if out_root else run_dir
+    rel = attempt_rel(agent, vuln_id, rep)
+    run_dir = runs / rel
+    out_dir = (out_root / rel) if out_root else run_dir
     eval_path = out_dir / "eval.json"
     log_path = out_dir / "eval.log"
 
@@ -556,7 +567,8 @@ def evaluate_one(workspaces: Path, runs: Path, agent: str, vuln_id: str,
     C = gen.get("claimed_success")
     P = gen.get("confidence")
     v = {
-        "agent": agent, "vuln_id": vuln_id, "model": gen.get("model"),
+        "agent": agent, "vuln_id": vuln_id, "repetition": rep, "model": gen.get("model"),
+        "generation_status": gen.get("status"),
         "evaluator_version": EVALUATOR_VERSION,
         "evaluated_at_utc": datetime.now(timezone.utc).isoformat(),
         "run_dir": str(run_dir),
@@ -576,15 +588,27 @@ def evaluate_one(workspaces: Path, runs: Path, agent: str, vuln_id: str,
     t0 = time.time()
     reason: Optional[str] = None
 
-    if not case_dir.exists() or not (case_dir / "meta.json").exists():
+    ok, msg = check_frozen(run_dir)
+    log.append(f"[frozen-check] {msg}")
+    gen_status = gen.get("status")
+    run_tests = False
+    if not ok:
+        reason = f"frozen_check_failed: {msg}"
+    elif gen_status in NO_ANSWER_STATUSES:
+        # Protocol: an unusable answer (unparseable, refusal, truncated) is a failed
+        # repair with no claim: C=0, V=0, complete. No tests are run.
+        v.update({"C": 0, "A": 0, "F": 0, "S": 0, "V": 0, "FA": 0, "status": "complete",
+                  "notes": f"no usable answer (generation status={gen_status})"})
+    elif gen_status in INFRA_GENERATION_STATUSES:
+        # No response from the API after the allowed retries: infrastructure,
+        # excluded from N_valid (spec section 5.2).
+        reason = f"infra_api_error (generation status={gen_status})"
+    elif not case_dir.exists() or not (case_dir / "meta.json").exists():
         reason = f"no workspace at {case_dir}"
     else:
-        ok, msg = check_frozen(run_dir)
-        log.append(f"[frozen-check] {msg}")
-        if not ok:
-            reason = f"frozen_check_failed: {msg}"
+        run_tests = True
 
-    if reason is None:
+    if run_tests:
         meta = json.loads((case_dir / "meta.json").read_text(encoding="utf-8"))
         dst_name = f"{agent}_candidate"
         with case_lock(case_dir):
@@ -633,8 +657,10 @@ def main():
     ap.add_argument("--workspaces", type=Path, default=WORKSPACES)
     ap.add_argument("--runs", type=Path, default=RUNS)
     ap.add_argument("--out-dir", type=Path, default=None,
-                    help="Write eval.json/eval.log under <out-dir>/<agent>/<vuln_id>/ "
+                    help="Write eval.json/eval.log under <out-dir>/<agent>/<vuln_id>[/rep<k>]/ "
                          "instead of next to the frozen files.")
+    ap.add_argument("--rep", type=int, default=None,
+                    help="Only this repetition (default: every rep<k> found)")
     ap.add_argument("--limit", type=int, default=None)
     args = ap.parse_args()
 
@@ -642,23 +668,38 @@ def main():
     if not agent_dir.exists():
         sys.exit(f"no runs for agent: {agent_dir}")
 
-    if args.vuln_id:
-        targets = [args.vuln_id]
-    else:
-        targets = sorted(p.name for p in agent_dir.iterdir() if (p / "generation.json").exists())
-        if args.limit:
-            targets = targets[: args.limit]
+    vids = [args.vuln_id] if args.vuln_id else sorted(p.name for p in agent_dir.iterdir()
+                                                      if p.is_dir())
+    targets: List[Tuple[str, Optional[int]]] = []
+    for vid in vids:
+        vdir = agent_dir / vid
+        reps = sorted(int(d.name[3:]) for d in vdir.glob("rep*")
+                      if d.name[3:].isdigit() and (d / "generation.json").exists())
+        if args.rep is not None:
+            reps = [r for r in reps if r == args.rep]
+        if reps:
+            targets += [(vid, r) for r in reps]
+        elif args.rep is None and (vdir / "generation.json").exists():
+            targets.append((vid, None))  # pilot layout, no repetitions
+    if args.limit:
+        targets = targets[: args.limit]
 
     n_done = 0
-    for vid in targets:
-        r = evaluate_one(args.workspaces, args.runs, args.agent, vid, args.out_dir)
+    by_status: Dict[str, int] = {}
+    for vid, rep in targets:
+        r = evaluate_one(args.workspaces, args.runs, args.agent, vid, args.out_dir, rep)
         if r is None:
             continue
         n_done += 1
-        print(f"  {args.agent}/{vid}: status={r['status']} A={r['A']} F={r['F']} S={r['S']} "
-              f"V={r['V']} C={r['C']} FA={r['FA']} "
-              f"(func_rc={r['functional_rc']} expl_rc={r['exploit_rc']}) {r['incomplete_reason'] or ''}")
-    print(f"[done] {args.agent}: {n_done}/{len(targets)} evaluated")
+        key = r["status"] if r["status"] != "complete" or r["generation_status"] == "ok" \
+            else f"complete/{r['generation_status']}"
+        by_status[key] = by_status.get(key, 0) + 1
+        tag = f"{vid}/rep{rep}" if rep else vid
+        print(f"  {args.agent}/{tag}: status={r['status']} gen={r['generation_status']} "
+              f"A={r['A']} F={r['F']} S={r['S']} V={r['V']} C={r['C']} FA={r['FA']} "
+              f"(func_rc={r['functional_rc']} expl_rc={r['exploit_rc']}) "
+              f"{r['incomplete_reason'] or ''}")
+    print(f"[done] {args.agent}: {n_done}/{len(targets)} evaluated; {by_status}")
 
 
 if __name__ == "__main__":
