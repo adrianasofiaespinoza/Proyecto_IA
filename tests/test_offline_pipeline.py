@@ -59,7 +59,8 @@ def openai_body(text, finish="stop", refusal=None, model="m"):
     return {"id": "cmpl_test", "object": "chat.completion", "created": 0, "model": model,
             "choices": [{"index": 0, "finish_reason": finish,
                          "message": {"role": "assistant", "content": text, "refusal": refusal}}],
-            "usage": {"prompt_tokens": 11, "completion_tokens": 42, "total_tokens": 53}}
+            "usage": {"prompt_tokens": 11, "completion_tokens": 42, "total_tokens": 53,
+                      "completion_tokens_details": {"reasoning_tokens": 7}}}
 
 
 class MockServer:
@@ -225,27 +226,41 @@ class TestProvidersThroughSDK(unittest.TestCase):
     def test_deepseek_request(self):
         (text, info, _, sig), srv = self._run(
             [(200, "json", openai_body(GOOD, model="deepseek-test"))],
-            lambda: ra.call_openai_compatible("deepseek", "SYS", "USER", "deepseek-test",
-                                              None, 32000))
+            lambda: ra.call_openai_compatible("deepseek", "SYS", "USER", "deepseek-flash",
+                                              None, 64000, "high"))
         req = srv.requests[0]
         body = json.loads(req.content)
         self.assertEqual(req.url.host, "api.deepseek.com")
         self.assertEqual(req.headers["authorization"], "Bearer dummy-deepseek")
+        self.assertEqual(body["model"], "deepseek-flash")
         self.assertEqual(body["messages"][0], {"role": "system", "content": "SYS"})
-        self.assertEqual(body["max_tokens"], 32000)
-        self.assertNotIn("temperature", body)
+        self.assertEqual(body["max_tokens"], 64000)
+        self.assertNotIn("max_completion_tokens", body)
+        self.assertEqual(body["reasoning_effort"], "high")
+        for forbidden in ("temperature", "thinking"):
+            self.assertNotIn(forbidden, body)
         self.assertEqual(text, GOOD)
         self.assertEqual(sig, {"refusal": False, "truncated": False})
+        self.assertEqual(info["reasoning_tokens"], 7)
+        for k in ("request_utc", "response_utc"):
+            self.assertTrue(info[k].endswith("+00:00"), info[k])
+        self.assertLessEqual(info["request_utc"], info["response_utc"])
 
-    def test_gpt_request_matches_pilot_shape(self):
-        (_, _, _, sig), srv = self._run(
+    def test_gpt_request(self):
+        (_, info, _, sig), srv = self._run(
             [(200, "json", openai_body("", finish="stop", refusal="I can't help"))],
-            lambda: ra.call_openai_compatible("gpt", "SYS", "USER", "gpt-6-luna", None, None))
+            lambda: ra.call_openai_compatible("gpt", "SYS", "USER", "gpt-6-luna",
+                                              None, 64000, "high"))
         req = srv.requests[0]
         body = json.loads(req.content)
         self.assertEqual(req.url.host, "api.openai.com")
+        self.assertEqual(body["model"], "gpt-6-luna")
+        self.assertEqual(body["max_completion_tokens"], 64000)
         self.assertNotIn("max_tokens", body)
+        self.assertEqual(body["reasoning_effort"], "high")
+        self.assertNotIn("temperature", body)
         self.assertTrue(sig["refusal"])
+        self.assertIn("request_utc", info)
 
     def test_sdk_auto_retries_disabled_and_errors_classified(self):
         for status, retryable in ((500, True), (429, True), (401, False), (404, False)):
@@ -253,7 +268,7 @@ class TestProvidersThroughSDK(unittest.TestCase):
             pa, po = patch_sdks(server)
             with pa, po:
                 with self.assertRaises(Exception) as cm:
-                    ra.call_openai_compatible("deepseek", "S", "U", "m", None, None)
+                    ra.call_openai_compatible("deepseek", "S", "U", "m", None, 64000, "high")
             self.assertEqual(len(server.requests), 1, f"SDK retried on {status}")
             self.assertEqual(ra.is_retryable(cm.exception), retryable, status)
             server = MockServer([(status, "json", {"type": "error",
@@ -285,14 +300,30 @@ class TestRunBuiltinEndToEnd(unittest.TestCase):
         out = self.runs / agent / "CVE-TEST-1" / f"rep{rep}"
         with pa, po:
             rc = ra.run_builtin(agent, model, "CVE-TEST-1", rep, self.case, out, "v2",
-                                None, kw.get("max_tokens", 64000 if agent == "claude" else None),
-                                "medium" if agent == "claude" else None,
+                                None, ra.DEFAULT_MAX_OUTPUT_TOKENS, ra.DEFAULT_REASONING_EFFORT,
                                 sleep=lambda s: None)
         return rc, out, server
 
     def evaluate(self, agent, rep=1):
         return ev.evaluate_one(self.root / "workspaces", self.runs, agent, "CVE-TEST-1",
                                rep=rep)
+
+    def test_study_models_record_settings_and_utc(self):
+        for agent, model, param in (("gpt", "gpt-6-luna", "max_completion_tokens"),
+                                    ("deepseek", "deepseek-flash", "max_tokens")):
+            rc, out, srv = self.attempt(agent, model,
+                                        [(200, "json", openai_body(GOOD, model=model))])
+            self.assertEqual(rc, 0)
+            body = json.loads(srv.requests[0].content)
+            self.assertEqual((body[param], body["reasoning_effort"]), (64000, "high"))
+            gen = json.loads((out / "generation.json").read_text())
+            self.assertEqual(gen["model"], model)
+            self.assertEqual(gen["settings"]["reasoning_effort"], "high")
+            self.assertEqual(gen["settings"]["max_output_tokens"], 64000)
+            self.assertEqual(gen["settings"]["max_tokens_param"], param)
+            self.assertEqual(gen["reasoning_tokens"], 7)
+            for k in ("request_utc", "response_utc"):
+                self.assertTrue(gen[k].endswith("+00:00"))
 
     def test_ok_is_frozen_and_prompt_v2(self):
         rc, out, _ = self.attempt("claude", "claude-opus-5-5",
@@ -301,6 +332,7 @@ class TestRunBuiltinEndToEnd(unittest.TestCase):
         gen = json.loads((out / "generation.json").read_text())
         self.assertEqual((gen["status"], gen["claimed_success"], gen["confidence"]), ("ok", 1, 0.7))
         self.assertEqual((gen["repetition"], gen["prompt_version"], gen["api_calls"]), (1, "v2", 1))
+        self.assertIn("request_utc", gen)
         self.assertEqual((out / "system_prompt.txt").read_text(), ra.SYSTEM_PROMPT_V2)
         frozen = json.loads((out / "frozen.json").read_text())["sha256"]
         for n in ("system_prompt.txt", "prompt.txt", "raw_api_response.json",
@@ -391,20 +423,34 @@ class TestCLIGuards(unittest.TestCase):
                               capture_output=True, text=True, env=env, cwd=ROOT)
 
     def test_missing_key_makes_no_call(self):
-        tmp = tempfile.mkdtemp()
-        cp = self.cli("--agent", "claude", "--model", "claude-opus-5-5", "--repetition", "1",
-                      "--vuln-id", "CVE-2023-6681", "--runs", tmp)
-        self.assertNotEqual(cp.returncode, 0)
-        self.assertIn("ANTHROPIC_API_KEY is not set", cp.stderr)
-        self.assertEqual(list(Path(tmp).iterdir()), [])
+        # Real keys in the caller's environment are removed by cli().
+        for agent, model, env_name in (("deepseek", "deepseek-flash", "DEEPSEEK_API_KEY"),
+                                       ("gpt", "gpt-6-luna", "OPENAI_API_KEY")):
+            tmp = tempfile.mkdtemp()
+            cp = self.cli("--agent", agent, "--model", model, "--repetition", "1",
+                          "--vuln-id", "CVE-2023-6681", "--runs", tmp)
+            self.assertNotEqual(cp.returncode, 0)
+            self.assertIn(f"{env_name} is not set", cp.stderr)
+            self.assertEqual(list(Path(tmp).iterdir()), [])
 
     def test_argument_guards(self):
-        k = {"ANTHROPIC_API_KEY": "dummy"}
+        k = {"ANTHROPIC_API_KEY": "dummy", "DEEPSEEK_API_KEY": "dummy"}
         cp = self.cli("--agent", "claude", "--model", "x", "--vuln-id", "X", env_extra=k)
         self.assertIn("--repetition", cp.stderr)
         cp = self.cli("--agent", "claude", "--model", "x", "--repetition", "1",
                       "--temperature", "0", "--vuln-id", "X", env_extra=k)
         self.assertIn("temperature", cp.stderr)
+        # DeepSeek would silently remap medium -> high: rejected before any call.
+        cp = self.cli("--agent", "deepseek", "--model", "deepseek-flash", "--repetition", "1",
+                      "--reasoning-effort", "medium", "--vuln-id", "X", env_extra=k)
+        self.assertNotEqual(cp.returncode, 0)
+        self.assertIn("not a documented value", cp.stderr)
+
+    def test_study_defaults(self):
+        self.assertEqual(ra.DEFAULT_REASONING_EFFORT, "high")
+        self.assertEqual(ra.DEFAULT_MAX_OUTPUT_TOKENS, 64000)
+        for agent in ("gpt", "deepseek"):
+            self.assertIn("high", ra.PROVIDERS[agent]["efforts"])
 
 
 if __name__ == "__main__":

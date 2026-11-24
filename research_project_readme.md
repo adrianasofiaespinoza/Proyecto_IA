@@ -54,7 +54,7 @@ The expected contribution has three parts:
 
 1. A reproducible evaluation protocol.
 2. Two metrics: Verified Repair Rate (VRR) and False Assurance Rate (FAR).
-3. A comparison of three models, including a classification of how repairs fail.
+3. A comparison of two models, including a classification of how repairs fail.
 
 
 ## 4. What Vul4Py Contains
@@ -258,17 +258,16 @@ In one case where the patch applied, the failing security test reads the name of
 
 ## 8. Future Work and Experimental Plan
 
-The full study will use three models:
+The full study will use two models:
 
-- `gpt-6-luna`
-- Claude Opus 5.5 (`claude-opus-5-5`)
-- DeepSeek-V4-Pro
+- GPT-6 Luna, OpenAI Chat Completions API, model ID `gpt-6-luna`
+- DeepSeek Flash, DeepSeek API (OpenAI-compatible), model ID `deepseek-flash`
 
 Up to thirty Vul4Py cases with status `OK` will be selected randomly. Each model will perform two trials per case.
 
 The maximum number of attempts is:
 
-$$N_{\text{total}} = M \times D \times R \le 3 \times 30 \times 2 = 180$$
+$$N_{\text{total}} = M \times D \times R \le 2 \times 30 \times 2 = 120$$
 
 Where:
 
@@ -276,7 +275,19 @@ Where:
 - \(D\) is the number of cases.
 - \(R\) is the number of repetitions.
 
-The total is **up to 180 attempts** because only some cases reach status `OK`, and some attempts may be incomplete.
+The total is **up to 120 attempts** because only some cases reach status `OK`, and some attempts may be incomplete.
+
+### Model Configuration
+
+Both models receive the same system prompt, the same user prompt and the same settings, which are sent explicitly in every request and recorded with the attempt:
+
+- **Reasoning effort:** `high` (`reasoning_effort` parameter in both APIs).
+- **Output limit:** 64,000 tokens (`max_completion_tokens` for GPT-6 Luna, `max_tokens` for DeepSeek Flash). An answer cut by this limit and not parseable counts as a failed repair.
+- **Temperature:** not sent; each provider's default applies.
+
+The reasoning levels share a name but are not identical across providers. Each provider defines and calibrates its own levels (for example, DeepSeek has no `medium` level and maps it to `high`), so `high` means the same requested setting, not the same amount of reasoning. The number of reasoning tokens reported by each API is recorded so this difference can be described.
+
+The pilot used the default reasoning effort (`medium`) of `gpt-6-luna`. Its results are not reused in the full study, because the prompt also changes (see below).
 
 The full study will report VRR, FAR, and claim rate with confidence intervals, compare FAR against the always-claim baseline, evaluate confidence calibration, and classify every failure.
 
@@ -302,18 +313,18 @@ In the pilot, confidence was requested in relation to the model's claim. Consequ
 
 ### Resources
 
-The study uses an Amazon EC2 instance with 30 GB of disk space, AWS credits, and API access to the three models.
+The study uses an Amazon EC2 instance with 30 GB of disk space, AWS credits, and API access to the two models.
 
 Disk space was the main constraint during the pilot. The disk had to be expanded from 8 GB to 30 GB, and each project's environment is deleted when it is no longer needed.
 
-Based on the pilot averages, 180 attempts would require approximately:
+Based on the pilot averages (5,119 input tokens, 2,082 output tokens and 22.4 seconds per attempt), 120 attempts would require approximately:
 
-- 900,000 input tokens.
-- 400,000 output tokens.
+- 614,000 input tokens.
+- 250,000 output tokens.
 
-These estimates vary by model, and the total cost has not yet been calculated.
+These estimates vary by model, and the total cost has not yet been calculated. They are likely a lower bound for output tokens: the pilot used `gpt-6-luna` with the default reasoning effort (`medium`), while the full study uses `high`, and reasoning tokens are billed as output tokens.
 
-At the pilot's average latency, the API calls alone would take approximately one hour. Total verification time has not yet been measured.
+At the pilot's average latency, the API calls alone would take approximately 45 minutes. Total verification time has not yet been measured.
 
 
 ### Reproducibility

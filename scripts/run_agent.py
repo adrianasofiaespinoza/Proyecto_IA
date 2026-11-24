@@ -14,9 +14,15 @@ One attempt per (agent, vuln_id, repetition). Output directory:
         frozen.json             SHA-256 of every file above; files set read-only
 
 Agents (all receive exactly the same prompts):
-    gpt       OpenAI Chat Completions          key: OPENAI_API_KEY
+    gpt       OpenAI Chat Completions          key: OPENAI_API_KEY     study model: gpt-6-luna
+    deepseek  DeepSeek (OpenAI-compatible)     key: DEEPSEEK_API_KEY   study model: deepseek-flash
     claude    Anthropic Messages (streamed)    key: ANTHROPIC_API_KEY
-    deepseek  DeepSeek (OpenAI-compatible)     key: DEEPSEEK_API_KEY
+
+Study settings, always sent explicitly and recorded in generation.json["settings"]:
+    reasoning effort  high    (gpt/deepseek: reasoning_effort; claude: output_config.effort)
+    output limit      64000   (gpt: max_completion_tokens; deepseek/claude: max_tokens)
+Reasoning levels are named alike but are not calibrated identically across providers.
+Each call's request/response times are stored as ISO-8601 UTC (request_utc, response_utc).
 
 Generation status recorded in generation.json:
     ok                   JSON parsed: diff, claimed_success and confidence are valid
@@ -60,11 +66,20 @@ HERE = Path(__file__).resolve().parent.parent
 WORKSPACES = HERE / "workspaces"
 RUNS = HERE / "runs"
 
+# Study models (research_project_readme.md, section 8): gpt-6-luna and deepseek-flash.
+# reasoning-effort values accepted per provider (from each provider's docs); values
+# that a provider would silently remap (e.g. DeepSeek medium -> high) are rejected.
 PROVIDERS = {
-    "gpt": {"provider": "openai", "key_env": "OPENAI_API_KEY", "base_url": None},
-    "claude": {"provider": "anthropic", "key_env": "ANTHROPIC_API_KEY", "base_url": None},
+    "gpt": {"provider": "openai", "key_env": "OPENAI_API_KEY", "base_url": None,
+            "max_tokens_param": "max_completion_tokens",
+            "efforts": ("none", "low", "medium", "high", "xhigh", "max")},
+    "claude": {"provider": "anthropic", "key_env": "ANTHROPIC_API_KEY", "base_url": None,
+               "max_tokens_param": "max_tokens",
+               "efforts": ("low", "medium", "high", "xhigh", "max")},
     "deepseek": {"provider": "deepseek", "key_env": "DEEPSEEK_API_KEY",
-                 "base_url": "https://api.deepseek.com"},
+                 "base_url": "https://api.deepseek.com",
+                 "max_tokens_param": "max_tokens",
+                 "efforts": ("none", "low", "high", "max")},
 }
 BUILTIN = set(PROVIDERS)
 EXTERNAL = {"openhands", "trae", "swe"}
@@ -73,8 +88,8 @@ MAX_API_RETRIES = 3                 # retries after the first call -> at most 4 
 RETRY_BACKOFF_S = (15, 60, 180)     # wait before retry 1, 2, 3
 REQUEST_TIMEOUT_S = 600.0
 RETRYABLE_STATUS = {408, 409, 429}  # plus every status >= 500
-CLAUDE_DEFAULT_MAX_TOKENS = 64000   # streamed, so no HTTP-timeout concern
-CLAUDE_DEFAULT_EFFORT = "medium"    # Claude Opus 5.5's API default, sent explicitly
+DEFAULT_MAX_OUTPUT_TOKENS = 64000   # common output limit (reasoning included where counted)
+DEFAULT_REASONING_EFFORT = "high"   # sent explicitly to every provider
 
 _COMMON_PROMPT = (
     "You are a security expert and a Python programmer. I will provide you with "
@@ -162,8 +177,13 @@ def build_user_prompt(vuln_id: str, files: List[tuple]) -> str:
 # ---------- provider calls ----------
 # Each returns (text, info, raw_dict, signals); signals = {"refusal", "truncated"}.
 
+def _iso(t: float) -> str:
+    return datetime.fromtimestamp(t, timezone.utc).isoformat()
+
+
 def call_openai_compatible(agent: str, system: str, prompt: str, model: str,
-                           temperature: Optional[float], max_tokens: Optional[int]):
+                           temperature: Optional[float], max_tokens: Optional[int],
+                           reasoning_effort: Optional[str]):
     from openai import OpenAI  # lazy
     cfg = PROVIDERS[agent]
     client = OpenAI(api_key=os.environ[cfg["key_env"]], base_url=cfg["base_url"],
@@ -172,7 +192,10 @@ def call_openai_compatible(agent: str, system: str, prompt: str, model: str,
     if temperature is not None:
         kwargs["temperature"] = temperature
     if max_tokens is not None:
-        kwargs["max_tokens"] = max_tokens
+        # gpt-6-luna: max_completion_tokens; DeepSeek: max_tokens.
+        kwargs[cfg["max_tokens_param"]] = max_tokens
+    if reasoning_effort is not None:
+        kwargs["reasoning_effort"] = reasoning_effort
     t_request = time.time()
     resp = client.chat.completions.create(
         model=model,
@@ -187,11 +210,15 @@ def call_openai_compatible(agent: str, system: str, prompt: str, model: str,
     text = choice.message.content or ""
     usage = resp.usage
     finish = choice.finish_reason
+    details = getattr(usage, "completion_tokens_details", None)
     info = {
         "model_returned": getattr(resp, "model", None),
         "input_tokens": getattr(usage, "prompt_tokens", None),
         "output_tokens": getattr(usage, "completion_tokens", None),
+        "reasoning_tokens": getattr(details, "reasoning_tokens", None),
         "stop_reason": finish,
+        "request_utc": _iso(t_request),
+        "response_utc": _iso(t_response),
         "t_request": t_request,
         "t_response": t_response,
         "latency_ms": 1000.0 * (t_response - t_request),
@@ -212,7 +239,7 @@ def call_anthropic(system: str, prompt: str, model: str, effort: Optional[str],
     if effort:
         kwargs["output_config"] = {"effort": effort}
     # No `fallbacks`: a refusal must stay a refusal of this model, not be answered
-    # by another model. No temperature (rejected by Claude Opus 5.5).
+    # by another model. No temperature (rejected by current Claude models).
     t_request = time.time()
     with client.messages.stream(
         model=model,
@@ -229,8 +256,11 @@ def call_anthropic(system: str, prompt: str, model: str, effort: Optional[str],
         "model_returned": msg.model,
         "input_tokens": msg.usage.input_tokens,
         "output_tokens": msg.usage.output_tokens,
+        "reasoning_tokens": None,  # not reported separately by the Messages API
         "stop_reason": msg.stop_reason,
         "stop_details": stop_details,
+        "request_utc": _iso(t_request),
+        "response_utc": _iso(t_response),
         "t_request": t_request,
         "t_response": t_response,
         "latency_ms": 1000.0 * (t_response - t_request),
@@ -394,7 +424,8 @@ def make_call(agent: str, system: str, user: str, model: str, temperature: Optio
               max_tokens: Optional[int], effort: Optional[str]) -> Callable[[], tuple]:
     if agent == "claude":
         return lambda: call_anthropic(system, user, model, effort, max_tokens)
-    return lambda: call_openai_compatible(agent, system, user, model, temperature, max_tokens)
+    return lambda: call_openai_compatible(agent, system, user, model, temperature, max_tokens,
+                                          effort)
 
 
 def run_builtin(agent: str, model: str, vuln_id: str, repetition: int, case_dir: Path,
@@ -422,8 +453,11 @@ def run_builtin(agent: str, model: str, vuln_id: str, repetition: int, case_dir:
         "prompt_version": prompt_version,
         "context_files": [r for r, _ in files],
         "prompt_sha256": hashlib.sha256((system + "\n" + user).encode()).hexdigest(),
-        "settings": {"temperature": temperature, "max_tokens": max_tokens,
-                     "effort": effort, "request_timeout_s": REQUEST_TIMEOUT_S,
+        "settings": {"temperature": temperature,
+                     "max_output_tokens": max_tokens,
+                     "max_tokens_param": PROVIDERS[agent]["max_tokens_param"],
+                     "reasoning_effort": effort,
+                     "request_timeout_s": REQUEST_TIMEOUT_S,
                      "max_api_retries": MAX_API_RETRIES, "sdk_auto_retries": 0,
                      "fallback_models": None},
         "versions": _sdk_versions(),
@@ -510,11 +544,14 @@ def main():
     ap.add_argument("--prompt-version", choices=sorted(SYSTEM_PROMPTS), default="v2")
     ap.add_argument("--temperature", type=float, default=None,
                     help="Only sent if given; not accepted for --agent claude")
-    ap.add_argument("--max-tokens", type=int, default=None,
-                    help=f"Output token limit (claude default {CLAUDE_DEFAULT_MAX_TOKENS}; "
-                         f"gpt/deepseek: not sent unless given)")
-    ap.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"], default=None,
-                    help=f"Claude only (default {CLAUDE_DEFAULT_EFFORT})")
+    ap.add_argument("--max-tokens", type=int, default=DEFAULT_MAX_OUTPUT_TOKENS,
+                    help=f"Output token limit, always sent (default {DEFAULT_MAX_OUTPUT_TOKENS}; "
+                         f"max_completion_tokens for gpt, max_tokens for deepseek/claude)")
+    ap.add_argument("--reasoning-effort", dest="effort", default=DEFAULT_REASONING_EFFORT,
+                    help=f"Always sent (default {DEFAULT_REASONING_EFFORT}). gpt: reasoning_effort "
+                         f"{'/'.join(PROVIDERS['gpt']['efforts'])}; deepseek: reasoning_effort "
+                         f"{'/'.join(PROVIDERS['deepseek']['efforts'])}; claude: output_config.effort "
+                         f"{'/'.join(PROVIDERS['claude']['efforts'])}")
     args = ap.parse_args()
 
     if args.agent in BUILTIN:
@@ -525,15 +562,12 @@ def main():
         key_env = PROVIDERS[args.agent]["key_env"]
         if not os.environ.get(key_env):
             sys.exit(f"{key_env} is not set; no API call was made")
-        if args.agent == "claude":
-            if args.temperature is not None:
-                sys.exit("--temperature is not accepted by Claude Opus 5.5")
-            if args.max_tokens is None:
-                args.max_tokens = CLAUDE_DEFAULT_MAX_TOKENS
-            if args.effort is None:
-                args.effort = CLAUDE_DEFAULT_EFFORT
-        elif args.effort is not None:
-            sys.exit("--effort only applies to --agent claude")
+        allowed = PROVIDERS[args.agent]["efforts"]
+        if args.effort not in allowed:
+            sys.exit(f"--reasoning-effort {args.effort!r} is not a documented value for "
+                     f"--agent {args.agent} (allowed: {', '.join(allowed)})")
+        if args.agent == "claude" and args.temperature is not None:
+            sys.exit("--temperature is not accepted by current Claude models")
 
     if args.vuln_id:
         targets = [args.vuln_id]
