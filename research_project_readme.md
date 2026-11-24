@@ -261,7 +261,7 @@ In one case where the patch applied, the failing security test reads the name of
 The full study will use three models:
 
 - `gpt-6-luna`
-- Claude Fable 5.1
+- Claude Opus 5.5 (`claude-opus-5-5`)
 - DeepSeek-V4-Pro
 
 Up to thirty Vul4Py cases with status `OK` will be selected randomly. Each model will perform two trials per case.
