@@ -1,0 +1,9 @@
+cve_id	status	verdict_src	func_vuln_rc	func_fixed_rc	exploit_vuln_rc	exploit_fixed_rc	fv_pfes	ff_pfes	ev_pfes	ef_pfes
+CVE-2017-16615	NON_ORACLE	struct+struct+struct+struct	1	0	1	0	13/2/0/0	15/0/0/0	0/1/0/0	1/0/0/0
+CVE-2019-10800	UNEXPECTED	struct+struct+struct+struct	2	2	2	2	0/0/1/0	0/0/1/0	0/0/1/0	0/0/1/0
+CVE-2023-34457	INFRA_BROKEN	rc+rc+rc+rc	4	4	4	4	-	-	-	-
+CVE-2023-47163	OK	struct+struct+struct+struct	0	0	1	0	65/0/0/0	66/0/0/0	65/1/0/0	66/0/0/0
+CVE-2024-34078	UNEXPECTED	struct+struct+struct+struct	1	1	1	1	138/1/0/0	140/1/0/0	139/2/0/0	140/1/0/0
+CVE-2025-1716	UNEXPECTED	struct+struct+struct+struct	2	2	2	2	0/0/1/0	0/0/1/0	0/0/1/0	0/0/1/0
+CVE-2025-1944	UNEXPECTED	struct+struct+struct+struct	2	2	2	2	0/0/1/0	0/0/1/0	0/0/1/0	0/0/1/0
+CVE-2025-46656	OK	struct+struct+struct+struct	0	0	1	0	75/0/0/0	75/0/0/0	44/1/0/0	45/0/0/0
