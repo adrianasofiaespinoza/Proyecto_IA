@@ -1,0 +1,10 @@
+diff --git a/src/picklescan/scanner.py b/src/picklescan/scanner.py
+--- a/src/picklescan/scanner.py
++++ b/src/picklescan/scanner.py
+@@ -126,4 +126,5 @@
+     "nt": "*",  # Alias for 'os' on Windows. Includes os.system()
+     "posix": "*",  # Alias for 'os' on Linux. Includes os.system()
+-    "operator": "attrgetter",  # Ex of code execution: operator.attrgetter("system")(__import__("os"))("echo pwned")
++    "operator": {"attrgetter", "methodcaller"},  # Ex of code execution: operator.attrgetter("system")(__import__("os"))("echo pwned")
++    "_operator": {"attrgetter", "methodcaller"},  # C extension alias of operator
+     "os": "*",

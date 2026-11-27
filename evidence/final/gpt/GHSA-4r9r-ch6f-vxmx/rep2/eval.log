@@ -1,0 +1,86 @@
+[frozen-check] ok
+[restore] /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable rev-parse HEAD
+[exit 0]
+58983e1c20973ac42f2df7ff15d7c8cd32f9b688
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable rev-parse --verify --quiet 58983e1c20973ac42f2df7ff15d7c8cd32f9b688^{commit}
+[exit 0]
+58983e1c20973ac42f2df7ff15d7c8cd32f9b688
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable checkout HEAD -- .
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable clean -fdx -e .venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+[restore] /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed rev-parse HEAD
+[exit 0]
+7f994d62084fe43f1cffdef2f9bae6923344ef53
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed rev-parse --verify --quiet 7f994d62084fe43f1cffdef2f9bae6923344ef53^{commit}
+[exit 0]
+7f994d62084fe43f1cffdef2f9bae6923344ef53
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed checkout HEAD -- .
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed clean -fdx -e .venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+[logs] removed stale patch_gpt_candidate.log
+[logs] removed stale bootstrap_gpt_candidate.log
+[logs] removed stale setup_gpt_candidate_0.log
+[logs] removed stale setup_gpt_candidate_1.log
+[logs] removed stale setup_gpt_candidate_2.log
+[logs] removed stale functional_gpt_candidate.junit.xml
+[logs] removed stale functional_gpt_candidate.log
+[logs] removed stale exploit_gpt_candidate.junit.xml
+[logs] removed stale exploit_gpt_candidate.log
+$ /home/ec2-user/vul4py/.proyect/bin/python /home/ec2-user/vul4py/scripts/vul4py.py --workspace-root /home/ec2-user/vul4py/workspaces --cve-id GHSA-4r9r-ch6f-vxmx fork --src vulnerable --dst gpt_candidate --patch /home/ec2-user/vul4py/runs/final/gpt/GHSA-4r9r-ch6f-vxmx/rep2/patch.diff
+[exit 1]
+[+] Fork GHSA-4r9r-ch6f-vxmx: copy vulnerable -> gpt_candidate
+[+] Applying patch /home/ec2-user/vul4py/runs/final/gpt/GHSA-4r9r-ch6f-vxmx/rep2/patch.diff to gpt_candidate
+
+Traceback (most recent call last):
+  File "/home/ec2-user/vul4py/scripts/vul4py.py", line 1450, in <module>
+    main()
+  File "/home/ec2-user/vul4py/scripts/vul4py.py", line 1446, in main
+    args.func(args)
+  File "/home/ec2-user/vul4py/scripts/vul4py.py", line 1272, in subcmd_fork
+    apply_unidiff_patch(dst_dir, patch_path, logs_dir)
+  File "/home/ec2-user/vul4py/scripts/vul4py.py", line 892, in apply_unidiff_patch
+    raise RuntimeError(f"Failed to apply patch {patch_file} to {dst_dir}. See {logfile}")
+RuntimeError: Failed to apply patch /home/ec2-user/vul4py/runs/final/gpt/GHSA-4r9r-ch6f-vxmx/rep2/patch.diff to /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/gpt_candidate. See /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/logs/patch_gpt_candidate.log
+
+[restore] /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable rev-parse HEAD
+[exit 0]
+58983e1c20973ac42f2df7ff15d7c8cd32f9b688
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable rev-parse --verify --quiet 58983e1c20973ac42f2df7ff15d7c8cd32f9b688^{commit}
+[exit 0]
+58983e1c20973ac42f2df7ff15d7c8cd32f9b688
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable checkout HEAD -- .
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable clean -fdx -e .venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+[restore] /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed rev-parse HEAD
+[exit 0]
+7f994d62084fe43f1cffdef2f9bae6923344ef53
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed rev-parse --verify --quiet 7f994d62084fe43f1cffdef2f9bae6923344ef53^{commit}
+[exit 0]
+7f994d62084fe43f1cffdef2f9bae6923344ef53
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed checkout HEAD -- .
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed clean -fdx -e .venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]

@@ -1,0 +1,138 @@
+{
+  "agent": "deepseek",
+  "vuln_id": "GHSA-4r9r-ch6f-vxmx",
+  "repetition": 2,
+  "model": "deepseek-flash",
+  "generation_status": "ok",
+  "evaluator_version": "9f54a0f+workspace-restore+test-logs+junit-rc+generation-status-reps",
+  "evaluated_at_utc": "2026-11-24T20:54:25.393673+00:00",
+  "run_dir": "runs/final/deepseek/GHSA-4r9r-ch6f-vxmx/rep2",
+  "C": 1,
+  "P": 0.88,
+  "A": 1,
+  "F": 1,
+  "S": 0,
+  "V": 0,
+  "FA": 1,
+  "status": "complete",
+  "incomplete_reason": null,
+  "apply_ok": true,
+  "apply_method": "git_apply",
+  "patched_files": [
+    "src/picklescan/scanner.py"
+  ],
+  "functional_rc": 0,
+  "exploit_rc": 1,
+  "functional": {
+    "rc": 0,
+    "process_exit": 0,
+    "timed_out": false,
+    "junit": {
+      "tests": 14,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 0,
+      "passed": 14,
+      "failed_cases": []
+    },
+    "value": 1,
+    "outcome": "pass",
+    "incomplete_reason": null
+  },
+  "exploit": {
+    "rc": 1,
+    "process_exit": 0,
+    "timed_out": false,
+    "junit": {
+      "tests": 14,
+      "failed": 1,
+      "errored": 0,
+      "skipped": 0,
+      "passed": 13,
+      "failed_cases": [
+        {
+          "kind": "failure",
+          "classname": "tests.test_scanner",
+          "name": "test_scan_file_path",
+          "file": "",
+          "message": "AssertionError: assert 0 == 1\n +  where 0 = ScanResult(globals=[Global(module='torch.utils.bottleneck.__main__', name='run_cprofile', safety=<SafetyLevel.Suspicious: 'suspicious'>)], scanned_files=1, issues_count=0, infected_files=0, scan_err=False).issues_count\n +  and   1 = ScanResult(globals=[Global(module='torch.utils.bottleneck.__main__', name='run_cprofile', safety=<SafetyLevel.Dangerous: 'dangerous'>)], scanned_files=1, issues_count=1, infected_files=1, scan_err=False).issues_count"
+        }
+      ]
+    },
+    "value": 0,
+    "outcome": "tests_failed",
+    "incomplete_reason": null
+  },
+  "plausible_legacy": false,
+  "workspace_restore": {
+    "before_eval": [
+      {
+        "tree": "vulnerable",
+        "ok": true,
+        "reason": null,
+        "head": "58983e1c20973ac42f2df7ff15d7c8cd32f9b688",
+        "expected_ref": "58983e1c20973ac42f2df7ff15d7c8cd32f9b688",
+        "n_dirty_before": 0,
+        "dirty_before": [],
+        "n_dirty_after": 0,
+        "dirty_after": []
+      },
+      {
+        "tree": "fixed",
+        "ok": true,
+        "reason": null,
+        "head": "7f994d62084fe43f1cffdef2f9bae6923344ef53",
+        "expected_ref": "7f994d62084fe43f1cffdef2f9bae6923344ef53",
+        "n_dirty_before": 0,
+        "dirty_before": [],
+        "n_dirty_after": 0,
+        "dirty_after": []
+      }
+    ],
+    "after_eval": [
+      {
+        "tree": "vulnerable",
+        "ok": true,
+        "reason": null,
+        "head": "58983e1c20973ac42f2df7ff15d7c8cd32f9b688",
+        "expected_ref": "58983e1c20973ac42f2df7ff15d7c8cd32f9b688",
+        "n_dirty_before": 0,
+        "dirty_before": [],
+        "n_dirty_after": 0,
+        "dirty_after": []
+      },
+      {
+        "tree": "fixed",
+        "ok": true,
+        "reason": null,
+        "head": "7f994d62084fe43f1cffdef2f9bae6923344ef53",
+        "expected_ref": "7f994d62084fe43f1cffdef2f9bae6923344ef53",
+        "n_dirty_before": 1,
+        "dirty_before": [
+          "!! src/picklescan.egg-info/"
+        ],
+        "n_dirty_after": 0,
+        "dirty_after": []
+      }
+    ]
+  },
+  "test_logs_dir": "runs/final/deepseek/GHSA-4r9r-ch6f-vxmx/rep2/test_logs",
+  "test_logs_sha256": {
+    "bootstrap_deepseek_candidate.log": "8ce18e569bf906b21d2f93dc1a46435a3b755b4b705022f31730a7e5f502ed33",
+    "bootstrap_fixed.log": "b0d1ec0465956ea66e93cdc180817dee03b4ebf1a92907a614b9e47ff016c34d",
+    "exploit_deepseek_candidate.junit.xml": "7b5a686f78920cb5a3b8cecdbf87e173067bed9ca4ce29b481956605423ba15b",
+    "exploit_deepseek_candidate.log": "5cc6564b73adaec38904d7716e62d76bed18ba7beefce1186c4746bb4547bb13",
+    "functional_deepseek_candidate.junit.xml": "50a813cbf11f2c0023bd345807ed05fb649b9a25614170a094ac7932e1717e6e",
+    "functional_deepseek_candidate.log": "a60f445e653da97293f94aad36ccc46ae11f17cb97bcd80869061e35db76c963",
+    "patch_deepseek_candidate.log": "ca34f1eb1c9ca3a12758e64746a65b85a0de108c37d6c01bb008db8cf7f2fe38",
+    "setup_deepseek_candidate_0.log": "83970d04be845ae50121620fe957ac8662507fc1d007a23e7dae1b176129d11c",
+    "setup_deepseek_candidate_1.log": "22b9b525768e6340f8b915644770d6e7a0c41118287336d7f2200f6447d944bc",
+    "setup_deepseek_candidate_2.log": "c7d51d32bf31f2147b2ec446da1d36f48483a8d92d4871c8a0d0a6bfd2e53ab9",
+    "setup_fixed_0.log": "3a26494faf12e71288c6004687ab2bfd1e29f282cf2ca15e9ac5c6cc9b5f3945",
+    "setup_fixed_1.log": "b63fc524d631b107b44ef82d9b766022c723b410cfd477f29dce0a950efdf650",
+    "setup_fixed_2.log": "723acebec36fb9d20bd3d6221da1381f5a1227902b10947c2ff5acda6ec64461"
+  },
+  "test_logs_error": null,
+  "elapsed_s": 57.7,
+  "notes": ""
+}

@@ -1,0 +1,11 @@
+{
+  "raw_text": "{\"diff\":\"--- a/src/picklescan/scanner.py\\n+++ b/src/picklescan/scanner.py\\n@@ -269,6 +269,8 @@ def _list_globals(data: IO[bytes], multiple_pickles=True) -> Set[Tuple[str, str]]:\\n             elif op_name in (\\\"GLOBAL\\\", \\\"INST\\\"):\\n                 globals.add(tuple(op_value.split(\\\" \\\", 1)))\\n+            elif op_name in (\\\"EXT1\\\", \\\"EXT2\\\", \\\"EXT4\\\"):\\n+                globals.add((\\\"unknown\\\", \\\"unknown\\\"))\\n             elif op_name == \\\"STACK_GLOBAL\\\":\\n                 values = []\\n                 for offset in range(1, n + 1):\\n\",\"claimed_success\":1,\"confidence\":0.83}",
+  "parse_error": null,
+  "signals": {
+    "refusal": false,
+    "truncated": false
+  },
+  "diff": "--- a/src/picklescan/scanner.py\n+++ b/src/picklescan/scanner.py\n@@ -269,6 +269,8 @@ def _list_globals(data: IO[bytes], multiple_pickles=True) -> Set[Tuple[str, str]]:\n             elif op_name in (\"GLOBAL\", \"INST\"):\n                 globals.add(tuple(op_value.split(\" \", 1)))\n+            elif op_name in (\"EXT1\", \"EXT2\", \"EXT4\"):\n+                globals.add((\"unknown\", \"unknown\"))\n             elif op_name == \"STACK_GLOBAL\":\n                 values = []\n                 for offset in range(1, n + 1):\n",
+  "claimed_success": 1,
+  "confidence": 0.83
+}

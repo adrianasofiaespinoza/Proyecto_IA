@@ -1,0 +1,11 @@
+2026-11-24T22:43:12+00:00 start: 1 cases x 2 models x 2 reps = 4
+2026-11-24T22:43:12+00:00 [1/4] gpt CVE-2024-28102 rep1
+[frozen] CVE-2024-28102 rep1: status=ok claim=1 conf=0.91 latency_ms=15375 api_calls=1
+2026-11-24T22:43:29+00:00 [2/4] deepseek CVE-2024-28102 rep1
+[frozen] CVE-2024-28102 rep1: status=ok claim=1 conf=0.9 latency_ms=70442 api_calls=1
+2026-11-24T22:44:39+00:00 [3/4] gpt CVE-2024-28102 rep2
+[frozen] CVE-2024-28102 rep2: status=ok claim=1 conf=0.88 latency_ms=25071 api_calls=1
+2026-11-24T22:45:04+00:00 [4/4] deepseek CVE-2024-28102 rep2
+[frozen] CVE-2024-28102 rep2: status=ok claim=1 conf=0.9 latency_ms=82705 api_calls=1
+2026-11-24T22:46:27+00:00 done: counts={'gpt:ok': 2, 'deepseek:ok': 2}
+EXIT=0

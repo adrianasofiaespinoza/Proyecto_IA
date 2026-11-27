@@ -1,0 +1,90 @@
+{
+  "ghsa_id": "GHSA-4r9r-ch6f-vxmx",
+  "cve_id": null,
+  "url": "https://api.github.com/advisories/GHSA-4r9r-ch6f-vxmx",
+  "html_url": "https://github.com/advisories/GHSA-4r9r-ch6f-vxmx",
+  "summary": "Picklescan missing detection when calling pytorch function torch.utils.bottleneck.__main__.run_cprofile",
+  "description": "### Summary\n\nUsing torch.utils.bottleneck.__main__.run_cprofile\n function, which is a pytorch library function to execute remote pickle file.\n\n### Details\n\nThe attack payload executes in the following steps:\n\nFirst, the attacker craft the payload by calling to torch.utils.bottleneck.__main__.run_cprofile\n function in reduce method\nThen when the victim after checking whether the pickle file is safe by using Picklescan library and this library doesn't dectect any dangerous functions, decide to pickle.load() this malicious pickle file, thus lead to remote code execution.\n\n### PoC\n\n```\nimport torch.utils.bottleneck.__main__ as bottleneck_main\n\nclass EvilTorchUtilsBottleneckRunCprofile:\n    def __reduce__(self):\n        code = '__import__(\"os\").system(\"whoami\")'\n        globs = {}\n        return bottleneck_main.run_cprofile, (code, globs)\n```\n\n### Impact\n\nWho is impacted? Any organization or individual relying on picklescan to detect malicious pickle files inside PyTorch models.\nWhat is the impact? Attackers can embed malicious code in pickle file that remains undetected but executes when the pickle file is loaded.\nSupply Chain Attack: Attackers can distribute infected pickle files across ML models, APIs, or saved Python objects.\n\n### Corresponding\n\nhttps://github.com/FredericDT\nhttps://github.com/Qhaoduoyu",
+  "type": "reviewed",
+  "severity": "medium",
+  "repository_advisory_url": "https://api.github.com/repos/mmaitre314/picklescan/security-advisories/GHSA-4r9r-ch6f-vxmx",
+  "source_code_location": "https://github.com/mmaitre314/picklescan",
+  "identifiers": [
+    {
+      "value": "GHSA-4r9r-ch6f-vxmx",
+      "type": "GHSA"
+    }
+  ],
+  "references": [
+    "https://github.com/mmaitre314/picklescan/security/advisories/GHSA-4r9r-ch6f-vxmx",
+    "https://github.com/mmaitre314/picklescan/pull/47",
+    "https://github.com/mmaitre314/picklescan/commit/7f994d62084fe43f1cffdef2f9bae6923344ef53",
+    "https://github.com/mmaitre314/picklescan/releases/tag/v0.0.28",
+    "https://github.com/advisories/GHSA-4r9r-ch6f-vxmx"
+  ],
+  "published_at": "2025-08-22T16:56:25Z",
+  "updated_at": "2025-08-22T16:56:27Z",
+  "github_reviewed_at": "2025-08-22T16:56:25Z",
+  "nvd_published_at": null,
+  "withdrawn_at": null,
+  "vulnerabilities": [
+    {
+      "package": {
+        "ecosystem": "pip",
+        "name": "picklescan"
+      },
+      "vulnerable_version_range": "<= 0.0.27",
+      "first_patched_version": "0.0.28",
+      "vulnerable_functions": [
+
+      ]
+    }
+  ],
+  "cvss_severities": {
+    "cvss_v3": {
+      "vector_string": null,
+      "score": 0.0
+    },
+    "cvss_v4": {
+      "vector_string": null,
+      "score": 0.0
+    }
+  },
+  "cwes": [
+    {
+      "cwe_id": "CWE-345",
+      "name": "Insufficient Verification of Data Authenticity"
+    }
+  ],
+  "credits": [
+    {
+      "user": {
+        "login": "FredericDT",
+        "id": 16513314,
+        "node_id": "MDQ6VXNlcjE2NTEzMzE0",
+        "avatar_url": "https://avatars.githubusercontent.com/u/16513314?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/FredericDT",
+        "html_url": "https://github.com/FredericDT",
+        "followers_url": "https://api.github.com/users/FredericDT/followers",
+        "following_url": "https://api.github.com/users/FredericDT/following{/other_user}",
+        "gists_url": "https://api.github.com/users/FredericDT/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/FredericDT/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/FredericDT/subscriptions",
+        "organizations_url": "https://api.github.com/users/FredericDT/orgs",
+        "repos_url": "https://api.github.com/users/FredericDT/repos",
+        "events_url": "https://api.github.com/users/FredericDT/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/FredericDT/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "type": "reporter"
+    }
+  ],
+  "comments": 0,
+  "cvss": {
+    "vector_string": null,
+    "score": null
+  }
+}

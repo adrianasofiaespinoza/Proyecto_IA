@@ -1,0 +1,115 @@
+[eval] 2026-11-24T20:15:42Z gpt CVE-2018-7753
+  gpt/CVE-2018-7753/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+  gpt/CVE-2018-7753/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 2/2 evaluated; {'complete': 2}
+[eval] 2026-11-24T20:15:42Z deepseek CVE-2018-7753
+  deepseek/CVE-2018-7753/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2018-7753 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:15:42Z gpt CVE-2021-32839
+  gpt/CVE-2021-32839/rep1: status=complete gen=ok A=1 F=1 S=1 V=1 C=1 FA=0 (func_rc=0 expl_rc=0) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:16:03Z deepseek CVE-2021-32839
+  deepseek/CVE-2021-32839/rep1: status=complete gen=ok A=1 F=0 S=0 V=0 C=1 FA=1 (func_rc=1 expl_rc=1) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2021-32839 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:16:20Z gpt CVE-2022-3102
+  gpt/CVE-2022-3102/rep1: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:16:45Z deepseek CVE-2022-3102
+  deepseek/CVE-2022-3102/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2022-3102 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:16:45Z gpt CVE-2023-30608
+  gpt/CVE-2023-30608/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:16:45Z deepseek CVE-2023-30608
+  deepseek/CVE-2023-30608/rep1: status=complete gen=ok A=1 F=0 S=1 V=0 C=1 FA=1 (func_rc=1 expl_rc=0) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2023-30608 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:17:04Z gpt CVE-2023-47163
+  gpt/CVE-2023-47163/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:17:04Z deepseek CVE-2023-47163
+  deepseek/CVE-2023-47163/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2023-47163 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:17:05Z gpt CVE-2023-6681
+  gpt/CVE-2023-6681/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:17:05Z deepseek CVE-2023-6681
+  deepseek/CVE-2023-6681/rep1: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2023-6681 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:17:29Z gpt CVE-2024-4340
+  gpt/CVE-2024-4340/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:17:29Z deepseek CVE-2024-4340
+  deepseek/CVE-2024-4340/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2024-4340 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:17:29Z gpt CVE-2024-53861
+  gpt/CVE-2024-53861/rep1: status=complete gen=ok A=1 F=1 S=1 V=1 C=1 FA=0 (func_rc=0 expl_rc=0) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:17:50Z deepseek CVE-2024-53861
+  deepseek/CVE-2024-53861/rep1: status=complete gen=ok A=1 F=1 S=1 V=1 C=1 FA=0 (func_rc=0 expl_rc=0) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2024-53861 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:18:06Z gpt CVE-2024-6866
+  gpt/CVE-2024-6866/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:18:06Z deepseek CVE-2024-6866
+  deepseek/CVE-2024-6866/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2024-6866 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:18:06Z gpt CVE-2025-43859
+  gpt/CVE-2025-43859/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:18:07Z deepseek CVE-2025-43859
+  deepseek/CVE-2025-43859/rep1: status=complete gen=ok A=1 F=1 S=1 V=1 C=1 FA=0 (func_rc=0 expl_rc=0) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2025-43859 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:18:26Z gpt CVE-2025-46656
+  gpt/CVE-2025-46656/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:18:27Z deepseek CVE-2025-46656
+  deepseek/CVE-2025-46656/rep1: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2025-46656 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:18:48Z gpt CVE-2025-59420
+  gpt/CVE-2025-59420/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:18:48Z deepseek CVE-2025-59420
+  deepseek/CVE-2025-59420/rep1: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2025-59420 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:19:36Z gpt CVE-2025-59940
+  gpt/CVE-2025-59940/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:19:36Z deepseek CVE-2025-59940
+  deepseek/CVE-2025-59940/rep1: status=complete gen=truncated A=0 F=0 S=0 V=0 C=0 FA=0 (func_rc=None expl_rc=None) 
+[done] deepseek: 1/1 evaluated; {'complete/truncated': 1}
+[eval] CVE-2025-59940 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:19:36Z gpt CVE-2025-61920
+  gpt/CVE-2025-61920/rep1: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:20:23Z deepseek CVE-2025-61920
+  deepseek/CVE-2025-61920/rep1: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2025-61920 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:21:03Z gpt CVE-2025-62800
+  gpt/CVE-2025-62800/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:21:04Z deepseek CVE-2025-62800
+  deepseek/CVE-2025-62800/rep1: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] CVE-2025-62800 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:21:55Z gpt GHSA-4r9r-ch6f-vxmx
+  gpt/GHSA-4r9r-ch6f-vxmx/rep1: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] gpt: 1/1 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:22:52Z deepseek GHSA-4r9r-ch6f-vxmx
+  deepseek/GHSA-4r9r-ch6f-vxmx/rep1: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/1 evaluated; {'complete': 1}
+[eval] GHSA-4r9r-ch6f-vxmx venvs wiped; disk: 20G free
+[done] 2026-11-24T20:23:30Z
+EXIT=0

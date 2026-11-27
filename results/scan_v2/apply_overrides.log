@@ -1,0 +1,36 @@
+[ok  ] CVE-2018-7753: applied -> /home/ec2-user/vul4py/workspaces/CVE-2018-7753/meta.json
+[ok  ] CVE-2019-1010017: applied -> /home/ec2-user/vul4py/workspaces/CVE-2019-1010017/meta.json
+[noop] CVE-2021-32839: already matches override
+[ok  ] CVE-2022-24439: applied -> /home/ec2-user/vul4py/workspaces/CVE-2022-24439/meta.json
+[ok  ] CVE-2023-29483: applied -> /home/ec2-user/vul4py/workspaces/CVE-2023-29483/meta.json
+[noop] CVE-2023-30608: already matches override
+[ok  ] CVE-2023-41040: applied -> /home/ec2-user/vul4py/workspaces/CVE-2023-41040/meta.json
+[ok  ] CVE-2023-46446: applied -> /home/ec2-user/vul4py/workspaces/CVE-2023-46446/meta.json
+[ok  ] CVE-2024-22190: applied -> /home/ec2-user/vul4py/workspaces/CVE-2024-22190/meta.json
+[ok  ] CVE-2024-34078: applied -> /home/ec2-user/vul4py/workspaces/CVE-2024-34078/meta.json
+[ok  ] CVE-2024-37891: applied -> /home/ec2-user/vul4py/workspaces/CVE-2024-37891/meta.json
+[noop] CVE-2024-51998: already matches override
+[ok  ] CVE-2024-52303: applied -> /home/ec2-user/vul4py/workspaces/CVE-2024-52303/meta.json
+[ok  ] CVE-2024-53861: applied -> /home/ec2-user/vul4py/workspaces/CVE-2024-53861/meta.json
+[ok  ] CVE-2024-9701: applied -> /home/ec2-user/vul4py/workspaces/CVE-2024-9701/meta.json
+[ok  ] CVE-2025-1944: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-1944/meta.json
+[ok  ] CVE-2025-48383: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-48383/meta.json
+[ok  ] CVE-2025-48994: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-48994/meta.json
+[ok  ] CVE-2025-50181: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-50181/meta.json
+[ok  ] CVE-2025-53365: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-53365/meta.json
+[ok  ] CVE-2025-53366: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-53366/meta.json
+[ok  ] CVE-2025-54413: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-54413/meta.json
+[ok  ] CVE-2025-54886: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-54886/meta.json
+[ok  ] CVE-2025-57804: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-57804/meta.json
+[ok  ] CVE-2025-59420: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-59420/meta.json
+[noop] CVE-2025-61765: already matches override
+[ok  ] CVE-2025-61920: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-61920/meta.json
+[ok  ] CVE-2025-62708: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-62708/meta.json
+[noop] CVE-2025-62727: already matches override
+[ok  ] CVE-2025-62800: applied -> /home/ec2-user/vul4py/workspaces/CVE-2025-62800/meta.json
+[ok  ] GHSA-3gf5-cxq9-w223: applied -> /home/ec2-user/vul4py/workspaces/GHSA-3gf5-cxq9-w223/meta.json
+[ok  ] GHSA-4r9r-ch6f-vxmx: applied -> /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/meta.json
+[ok  ] GHSA-753j-mpmx-qq6g: applied -> /home/ec2-user/vul4py/workspaces/GHSA-753j-mpmx-qq6g/meta.json
+[ok  ] GHSA-vhmj-5q9r-mm9g: applied -> /home/ec2-user/vul4py/workspaces/GHSA-vhmj-5q9r-mm9g/meta.json
+[ok  ] GHSA-w235-7p84-xx57: applied -> /home/ec2-user/vul4py/workspaces/GHSA-w235-7p84-xx57/meta.json
+[done] applied=30  skipped=5  total=35

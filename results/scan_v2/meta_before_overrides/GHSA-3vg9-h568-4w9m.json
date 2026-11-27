@@ -1,0 +1,37 @@
+{
+  "cve_id": "GHSA-3vg9-h568-4w9m",
+  "repo_url": "https://github.com/mmaitre314/picklescan",
+  "fix_commit": "aecd11be98702caa9ba9b12189d91ad596a36114",
+  "vulnerable_ref": "7f994d62084fe43f1cffdef2f9bae6923344ef53",
+  "fixed_ref": "aecd11be98702caa9ba9b12189d91ad596a36114",
+  "versions": {
+    "vulnerable": {
+      "git_ref": "7f994d62084fe43f1cffdef2f9bae6923344ef53"
+    },
+    "fixed": {
+      "git_ref": "aecd11be98702caa9ba9b12189d91ad596a36114"
+    }
+  },
+  "python_version": "3.11",
+  "install_cmds": [
+    "python -m pip install -U pip wheel",
+    "pip install -e ."
+  ],
+  "functional_test_cmd_base": "pytest -q",
+  "baseline_test_files": [
+    "tests/__init__.py",
+    "tests/test_scanner.py"
+  ],
+  "exploit_test_cmd_base": "pytest -q",
+  "new_test_files": [
+    "tests/test_scanner.py"
+  ],
+  "new_code_files": [
+    "src/picklescan/scanner.py"
+  ],
+  "exploit_expectation": {
+    "vulnerable_should_fail": true,
+    "fixed_should_pass": true
+  },
+  "notes": ""
+}

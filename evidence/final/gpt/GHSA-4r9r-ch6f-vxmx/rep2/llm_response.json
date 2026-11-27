@@ -1,0 +1,11 @@
+{
+  "raw_text": "{\"diff\":\"--- a/src/picklescan/scanner.py\\n+++ b/src/picklescan/scanner.py\\n@@ -266,6 +266,9 @@ def _list_globals(data: IO[bytes], multiple_pickles=True) -> Set[Tuple[str, str]]:\\n                 memo[op_value] = ops[n - 1][1]\\n+            elif op_name in (\\\"EXT1\\\", \\\"EXT2\\\", \\\"EXT4\\\"):\\n+                # Extension opcodes resolve globals through the unpickler's\\n+                # extension registry, so their target cannot be determined here.\\n+                globals.add((\\\"unknown\\\", \\\"unknown\\\"))\\n             elif op_name in (\\\"GLOBAL\\\", \\\"INST\\\"):\\n                 globals.add(tuple(op_value.split(\\\" \\\", 1)))\\n*** End Patch\",\"claimed_success\":1,\"confidence\":0.78}",
+  "parse_error": null,
+  "signals": {
+    "refusal": false,
+    "truncated": false
+  },
+  "diff": "--- a/src/picklescan/scanner.py\n+++ b/src/picklescan/scanner.py\n@@ -266,6 +266,9 @@ def _list_globals(data: IO[bytes], multiple_pickles=True) -> Set[Tuple[str, str]]:\n                 memo[op_value] = ops[n - 1][1]\n+            elif op_name in (\"EXT1\", \"EXT2\", \"EXT4\"):\n+                # Extension opcodes resolve globals through the unpickler's\n+                # extension registry, so their target cannot be determined here.\n+                globals.add((\"unknown\", \"unknown\"))\n             elif op_name in (\"GLOBAL\", \"INST\"):\n                 globals.add(tuple(op_value.split(\" \", 1)))\n*** End Patch",
+  "claimed_success": 1,
+  "confidence": 0.78
+}

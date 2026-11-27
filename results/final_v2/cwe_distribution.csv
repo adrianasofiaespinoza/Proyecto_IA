@@ -1,0 +1,14 @@
+cwe,cases
+CWE-400 Uncontrolled Resource Consumption,4
+CWE-20 Improper Input Validation,3
+CWE-674 Uncontrolled Recursion,2
+CWE-770 Allocation of Resources Without Limits or Throttling,2
+CWE-345 Insufficient Verification of Data Authenticity,2
+(none listed),1
+CWE-1333 Inefficient Regular Expression Complexity,1
+CWE-697 Incorrect Comparison,1
+CWE-178 Improper Handling of Case Sensitivity,1
+CWE-444 Inconsistent Interpretation of HTTP Requests,1
+CWE-1284 Improper Validation of Specified Quantity in Input,1
+CWE-863 Incorrect Authorization,1
+CWE-79 Improper Neutralization of Input During Web Page Generation,1

@@ -1,0 +1,2 @@
+cve_id,failed_controls,reason,manual_note
+CVE-2025-6176,not_buildable (no new_code_files),meta.json lists no new_code_files: the repair prompt would contain no source file,

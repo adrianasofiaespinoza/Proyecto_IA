@@ -1,0 +1,88 @@
+{
+  "cve_id": "GHSA-753j-mpmx-qq6g",
+  "repo_url": "https://github.com/tornadoweb/tornado",
+  "fix_commit": "d65f6e71a77f53a1ff0a0dc55704be13f04eb572",
+  "vulnerable_ref": "7786f09f84c9f3f2012c4cf3878417cb9f053669",
+  "fixed_ref": "d65f6e71a77f53a1ff0a0dc55704be13f04eb572",
+  "versions": {
+    "vulnerable": {
+      "git_ref": "7786f09f84c9f3f2012c4cf3878417cb9f053669"
+    },
+    "fixed": {
+      "git_ref": "d65f6e71a77f53a1ff0a0dc55704be13f04eb572"
+    }
+  },
+  "python_version": "3.11",
+  "install_cmds": [
+    "python -m pip install -U pip wheel",
+    "pip install -e ."
+  ],
+  "functional_test_cmd_base": "pytest -q",
+  "baseline_test_files": [
+    "maint/scripts/test_resolvers.py",
+    "maint/test/cython/cythonapp_test.py",
+    "maint/test/cython/pythonmodule.py",
+    "maint/test/cython/setup.py",
+    "maint/test/mypy/bad.py",
+    "maint/test/mypy/good.py",
+    "maint/test/mypy/setup.py",
+    "maint/test/redbot/red_test.py",
+    "maint/test/websocket/client.py",
+    "maint/test/websocket/server.py",
+    "tornado/testing.py",
+    "tornado/test/__init__.py",
+    "tornado/test/resolve_test_helper.py",
+    "tornado/test/__main__.py",
+    "tornado/test/asyncio_test.py",
+    "tornado/test/auth_test.py",
+    "tornado/test/autoreload_test.py",
+    "tornado/test/circlerefs_test.py",
+    "tornado/test/concurrent_test.py",
+    "tornado/test/curl_httpclient_test.py",
+    "tornado/test/escape_test.py",
+    "tornado/test/gen_test.py",
+    "tornado/test/http1connection_test.py",
+    "tornado/test/httpclient_test.py",
+    "tornado/test/httpserver_test.py",
+    "tornado/test/httputil_test.py",
+    "tornado/test/import_test.py",
+    "tornado/test/ioloop_test.py",
+    "tornado/test/iostream_test.py",
+    "tornado/test/locale_test.py",
+    "tornado/test/locks_test.py",
+    "tornado/test/log_test.py",
+    "tornado/test/netutil_test.py",
+    "tornado/test/options_test.py",
+    "tornado/test/process_test.py",
+    "tornado/test/queues_test.py",
+    "tornado/test/routing_test.py",
+    "tornado/test/runtests.py",
+    "tornado/test/simple_httpclient_test.py",
+    "tornado/test/tcpclient_test.py",
+    "tornado/test/tcpserver_test.py",
+    "tornado/test/template_test.py",
+    "tornado/test/testing_test.py",
+    "tornado/test/twisted_test.py",
+    "tornado/test/util.py",
+    "tornado/test/util_test.py",
+    "tornado/test/web_test.py",
+    "tornado/test/websocket_test.py",
+    "tornado/test/wsgi_test.py",
+    "tornado/test/gettext_translations/extract_me.py"
+  ],
+  "exploit_test_cmd_base": "pytest -q",
+  "new_test_files": [
+    "tornado/test/httpserver_test.py",
+    "tornado/test/httputil_test.py",
+    "tornado/test/simple_httpclient_test.py"
+  ],
+  "new_code_files": [
+    "tornado/http1connection.py",
+    "tornado/httputil.py"
+  ],
+  "exploit_expectation": {
+    "vulnerable_should_fail": true,
+    "fixed_should_pass": true
+  },
+  "notes": ""
+}

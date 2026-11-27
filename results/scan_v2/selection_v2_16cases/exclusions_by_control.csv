@@ -1,0 +1,3 @@
+control,ok_cases_failing
+not_buildable (no new_code_files),1
+any (excluded cases),1

@@ -1,0 +1,38 @@
+{
+  "cve_id": "GHSA-4r9r-ch6f-vxmx",
+  "repo_url": "https://github.com/mmaitre314/picklescan",
+  "fix_commit": "7f994d62084fe43f1cffdef2f9bae6923344ef53",
+  "vulnerable_ref": "58983e1c20973ac42f2df7ff15d7c8cd32f9b688",
+  "fixed_ref": "7f994d62084fe43f1cffdef2f9bae6923344ef53",
+  "versions": {
+    "vulnerable": {
+      "git_ref": "58983e1c20973ac42f2df7ff15d7c8cd32f9b688"
+    },
+    "fixed": {
+      "git_ref": "7f994d62084fe43f1cffdef2f9bae6923344ef53"
+    }
+  },
+  "python_version": "3.11",
+  "install_cmds": [
+    "python -m pip install -U pip wheel",
+    "pip install -e ."
+  ],
+  "functional_test_cmd_base": "pytest -q",
+  "baseline_test_files": [
+    "tests/__init__.py",
+    "tests/test_scanner.py"
+  ],
+  "exploit_test_cmd_base": "pytest -q",
+  "new_test_files": [
+    "tests/test_scanner.py"
+  ],
+  "new_code_files": [
+    "src/picklescan/cli.py",
+    "src/picklescan/scanner.py"
+  ],
+  "exploit_expectation": {
+    "vulnerable_should_fail": true,
+    "fixed_should_pass": true
+  },
+  "notes": ""
+}

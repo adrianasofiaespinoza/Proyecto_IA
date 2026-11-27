@@ -1,0 +1,6 @@
+[+] Scanning all CVEs under /home/ec2-user/vul4py/workspaces with 2 workers (timeout 3600s/CVE)
+[+] Tools root: /home/ec2-user/vul4py/workspaces/.vul4py_tools
+[+] Prewarming compiler env + python interpreters: ['3.11']
+Scanning CVEs:   0%|          | 0/6 [00:00<?, ?it/s]Scanning CVEs:  17%|█▋        | 1/6 [01:34<07:54, 94.85s/it]Scanning CVEs:  50%|█████     | 3/6 [02:35<02:21, 47.09s/it]Scanning CVEs:  83%|████████▎ | 5/6 [03:07<00:31, 31.03s/it]Scanning CVEs: 100%|██████████| 6/6 [03:07<00:00, 31.22s/it]
+[+] Scan complete. Report written to /home/ec2-user/vul4py/workspaces/scan_report.tsv
+    pfes columns are passed/failed/errored/skipped per run; '-' means junit was not produced (rc-based fallback in effect).

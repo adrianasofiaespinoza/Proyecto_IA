@@ -1,0 +1,95 @@
+{
+  "generated_at_utc": "2026-11-24T22:43:12.801882+00:00",
+  "seed": 20261124,
+  "n_max": 30,
+  "eligibility": "scan-ok",
+  "method": "random.Random(seed).sample(sorted(eligible), n) if len(eligible) > n else all",
+  "scan_report": "results/scan_v2/scan_report_v2.tsv",
+  "scan_report_sha256": "6d9463d95af80b46c0a23b3b114bd6ddbd53954a60e1f485a80502ee4f905f0a",
+  "scan_status_counts": {
+    "NON_ORACLE": 1,
+    "UNEXPECTED": 49,
+    "OK": 18,
+    "INFRA_BROKEN": 30
+  },
+  "n_ok": 18,
+  "n_eligible": 17,
+  "n_excluded": 1,
+  "n_selected": 17,
+  "exclusions_by_control": [
+    {
+      "control": "not_buildable (no new_code_files)",
+      "ok_cases_failing": 1
+    },
+    {
+      "control": "any (excluded cases)",
+      "ok_cases_failing": 1
+    }
+  ],
+  "ok_ids": [
+    "CVE-2018-7753",
+    "CVE-2021-32839",
+    "CVE-2022-3102",
+    "CVE-2023-30608",
+    "CVE-2023-47163",
+    "CVE-2023-6681",
+    "CVE-2024-28102",
+    "CVE-2024-4340",
+    "CVE-2024-53861",
+    "CVE-2024-6866",
+    "CVE-2025-43859",
+    "CVE-2025-46656",
+    "CVE-2025-59420",
+    "CVE-2025-59940",
+    "CVE-2025-6176",
+    "CVE-2025-61920",
+    "CVE-2025-62800",
+    "GHSA-4r9r-ch6f-vxmx"
+  ],
+  "eligible": [
+    "CVE-2018-7753",
+    "CVE-2021-32839",
+    "CVE-2022-3102",
+    "CVE-2023-30608",
+    "CVE-2023-47163",
+    "CVE-2023-6681",
+    "CVE-2024-28102",
+    "CVE-2024-4340",
+    "CVE-2024-53861",
+    "CVE-2024-6866",
+    "CVE-2025-43859",
+    "CVE-2025-46656",
+    "CVE-2025-59420",
+    "CVE-2025-59940",
+    "CVE-2025-61920",
+    "CVE-2025-62800",
+    "GHSA-4r9r-ch6f-vxmx"
+  ],
+  "selected": [
+    "CVE-2018-7753",
+    "CVE-2021-32839",
+    "CVE-2022-3102",
+    "CVE-2023-30608",
+    "CVE-2023-47163",
+    "CVE-2023-6681",
+    "CVE-2024-28102",
+    "CVE-2024-4340",
+    "CVE-2024-53861",
+    "CVE-2024-6866",
+    "CVE-2025-43859",
+    "CVE-2025-46656",
+    "CVE-2025-59420",
+    "CVE-2025-59940",
+    "CVE-2025-61920",
+    "CVE-2025-62800",
+    "GHSA-4r9r-ch6f-vxmx"
+  ],
+  "excluded": [
+    {
+      "cve_id": "CVE-2025-6176",
+      "failed_controls": "not_buildable (no new_code_files)",
+      "reason": "meta.json lists no new_code_files: the repair prompt would contain no source file",
+      "manual_note": ""
+    }
+  ]
+}

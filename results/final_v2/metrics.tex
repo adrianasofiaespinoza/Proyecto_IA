@@ -1,0 +1,25 @@
+\begin{table}[ht]
+\centering
+\caption{Verified repair, false assurance and calibration by model. 95\% percentile bootstrap CIs, 10000 resamples of whole vulnerabilities (seed 20261124). 'undefined' = cannot be computed (e.g. FAR with no claims, AUROC without both verified and unverified attempts).}
+\label{tab:final-metrics}
+\begin{tabular}{lrr}
+\hline
+Metric & gpt-6-luna & deepseek-flash \\
+\hline
+Attempts (valid / total) & 34 / 34 & 34 / 34 \\
+Vulnerabilities & 17 & 17 \\
+Sum V / Sum C / Sum FA & 3 / 34 / 31 & 4 / 33 / 29 \\
+VRR & 8.8\% [0.0\%, 23.5\%] & 11.8\% [0.0\%, 26.5\%] \\
+FAR & 91.2\% [76.5\%, 100.0\%] & 87.9\% [72.7\%, 100.0\%] \\
+Claim rate (CR) & 100.0\% [100.0\%, 100.0\%] & 97.1\% [91.2\%, 100.0\%] \\
+FAR always-claim baseline (1 - VRR) & 91.2\% [76.5\%, 100.0\%] & 88.2\% [73.5\%, 100.0\%] \\
+Claim precision (1 - FAR) & 8.8\% [0.0\%, 23.5\%] & 12.1\% [0.0\%, 27.3\%] \\
+FAR | A=1 & 70.0\% [30.0\%, 100.0\%] & 85.2\% [68.0\%, 100.0\%] \\
+Brier score & 0.704 [0.591, 0.789] & 0.641 [0.525, 0.742] \\
+ECE (10 bins) & 0.797 [0.674, 0.884] & 0.738 [0.603, 0.844] \\
+AUROC & 0.978 [0.924, 1.000] & 0.871 [0.730, 0.953] \\
+Latency mean [95\% CI] / median / p90 (s) & 22.9 [17.5, 29.3] / 20.3 / 38.2 & 107.7 [82.9, 133.4] / 83.6 / 177.0 \\
+Mean output / reasoning tokens & 3185 / 2822 & 22943 / 22616 \\
+\hline
+\end{tabular}
+\end{table}

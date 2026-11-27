@@ -1,0 +1,38 @@
+$ python -m pip install --index-url https://download.pytorch.org/whl/cpu 'torch==2.4.0'
+[exit 0]
+
+STDOUT:
+VENV_PY=/home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed/.venv/bin/python
+VENV_PYTEST=/home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed/.venv/bin/pytest
+GCC_BIN=/usr/bin/gcc
+Looking in indexes: https://download.pytorch.org/whl/cpu
+Collecting torch==2.4.0
+  Using cached torch-2.4.0%2Bcpu-cp311-cp311-linux_x86_64.whl (195.1 MB)
+Collecting filelock (from torch==2.4.0)
+  Using cached filelock-4.2.4-py3-none-any.whl.metadata (2.0 kB)
+Requirement already satisfied: typing-extensions>=4.8.0 in ./.venv/lib/python3.11/site-packages (from torch==2.4.0) (4.16.0)
+Collecting sympy (from torch==2.4.0)
+  Using cached sympy-1.14.0-py3-none-any.whl.metadata (12 kB)
+Collecting networkx (from torch==2.4.0)
+  Using cached networkx-3.6.1-py3-none-any.whl.metadata (6.8 kB)
+Collecting jinja2 (from torch==2.4.0)
+  Using cached jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting fsspec (from torch==2.4.0)
+  Using cached fsspec-2026.9.0-py3-none-any.whl.metadata (10 kB)
+Collecting MarkupSafe>=2.0 (from jinja2->torch==2.4.0)
+  Using cached markupsafe-3.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+Collecting mpmath<1.4,>=1.1.0 (from sympy->torch==2.4.0)
+  Using cached mpmath-1.3.0-py3-none-any.whl.metadata (8.6 kB)
+Using cached filelock-4.2.4-py3-none-any.whl (162 kB)
+Using cached fsspec-2026.9.0-py3-none-any.whl (221 kB)
+Using cached jinja2-3.1.6-py3-none-any.whl (134 kB)
+Using cached markupsafe-3.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+Using cached networkx-3.6.1-py3-none-any.whl (2.1 MB)
+Using cached sympy-1.14.0-py3-none-any.whl (6.3 MB)
+Using cached mpmath-1.3.0-py3-none-any.whl (536 kB)
+Installing collected packages: mpmath, sympy, networkx, MarkupSafe, fsspec, filelock, jinja2, torch
+
+Successfully installed MarkupSafe-3.0.3 filelock-4.2.4 fsspec-2026.9.0 jinja2-3.1.6 mpmath-1.3.0 networkx-3.6.1 sympy-1.14.0 torch-2.4.0+cpu
+
+STDERR:
+

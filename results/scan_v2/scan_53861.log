@@ -1,0 +1,4 @@
+[batch 1] 2026-11-24T19:33:57Z 1 cases: CVE-2024-53861
+[batch 1] scan exit=0
+[batch 1] venvs wiped; disk: 20G free
+[done] 2026-11-24T19:34:14Z

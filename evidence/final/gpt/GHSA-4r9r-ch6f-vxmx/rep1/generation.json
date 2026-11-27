@@ -1,0 +1,44 @@
+{
+  "agent": "gpt",
+  "provider": "openai",
+  "model": "gpt-6-luna",
+  "vuln_id": "GHSA-4r9r-ch6f-vxmx",
+  "repetition": 1,
+  "timestamp_utc": "2026-11-24T20:13:10.779384+00:00",
+  "prompt_version": "v2",
+  "context_files": [
+    "src/picklescan/cli.py",
+    "src/picklescan/scanner.py"
+  ],
+  "prompt_sha256": "072e959d214fb9cfd273df4254706d4eae12f4e83baff8ca388659fd5d363c06",
+  "settings": {
+    "temperature": null,
+    "max_output_tokens": 64000,
+    "max_tokens_param": "max_completion_tokens",
+    "reasoning_effort": "high",
+    "request_timeout_s": 600.0,
+    "max_api_retries": 3,
+    "sdk_auto_retries": 0,
+    "fallback_models": null
+  },
+  "versions": {
+    "python": "3.9.25",
+    "openai": "2.48.0",
+    "anthropic": "0.125.0"
+  },
+  "api_calls": 1,
+  "model_returned": "gpt-6-luna",
+  "input_tokens": 5505,
+  "output_tokens": 3001,
+  "reasoning_tokens": 2794,
+  "stop_reason": "stop",
+  "request_utc": "2026-11-24T20:13:10.783665+00:00",
+  "response_utc": "2026-11-24T20:13:33.281760+00:00",
+  "t_request": 1795551190.7836654,
+  "t_response": 1795551213.2817605,
+  "latency_ms": 22498.09503555298,
+  "status": "ok",
+  "claimed_success": 1,
+  "confidence": 0.83,
+  "error": null
+}

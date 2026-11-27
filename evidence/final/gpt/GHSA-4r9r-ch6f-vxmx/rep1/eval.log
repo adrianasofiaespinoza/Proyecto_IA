@@ -1,0 +1,100 @@
+[frozen-check] ok
+[restore] /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable rev-parse HEAD
+[exit 0]
+58983e1c20973ac42f2df7ff15d7c8cd32f9b688
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable rev-parse --verify --quiet 58983e1c20973ac42f2df7ff15d7c8cd32f9b688^{commit}
+[exit 0]
+58983e1c20973ac42f2df7ff15d7c8cd32f9b688
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+ M tests/test_scanner.py
+?? backported_support/
+?? tests/data2/GHSA-4r9r-ch6f-vxmx.pkl
+?? tests/data2/GHSA-86cj-95qr-2p4f.pkl
+?? tests/data2/GHSA-f4x7-rfwp-v3xw.pkl
+?? tests/data2/GHSA-f745-w6jp-hpxx.pkl
+?? tests/data2/GHSA-h3qp-7fh3-f8h4.pkl
+?? tests/data2/GHSA-jhph-76pp-mggw.pkl
+?? tests/data2/GHSA-vr7h-p6mm-wpmh.pkl
+?? tests/data2/GHSA-vv6j-3g6g-2pvj.pkl
+!! .pytest_cache/
+!! src/picklescan.egg-info/
+!! src/picklescan/__pycache__/
+!! tests/__pycache__/
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable checkout HEAD -- .
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable clean -fdx -e .venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+[restore] /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed rev-parse HEAD
+[exit 0]
+7f994d62084fe43f1cffdef2f9bae6923344ef53
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed rev-parse --verify --quiet 7f994d62084fe43f1cffdef2f9bae6923344ef53^{commit}
+[exit 0]
+7f994d62084fe43f1cffdef2f9bae6923344ef53
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+!! .pytest_cache/
+!! src/picklescan.egg-info/
+!! src/picklescan/__pycache__/
+!! tests/__pycache__/
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed checkout HEAD -- .
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed clean -fdx -e .venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+$ /home/ec2-user/vul4py/.proyect/bin/python /home/ec2-user/vul4py/scripts/vul4py.py --workspace-root /home/ec2-user/vul4py/workspaces --cve-id GHSA-4r9r-ch6f-vxmx fork --src vulnerable --dst gpt_candidate --patch /home/ec2-user/vul4py/runs/final/gpt/GHSA-4r9r-ch6f-vxmx/rep1/patch.diff
+[exit 0]
+[+] Fork GHSA-4r9r-ch6f-vxmx: copy vulnerable -> gpt_candidate
+[+] Applying patch /home/ec2-user/vul4py/runs/final/gpt/GHSA-4r9r-ch6f-vxmx/rep1/patch.diff to gpt_candidate
+[+] Fork (copy) done.
+
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable apply --check /home/ec2-user/vul4py/runs/final/gpt/GHSA-4r9r-ch6f-vxmx/rep1/patch.diff
+[exit 128]
+error: corrupt patch at line 11
+
+$ /home/ec2-user/vul4py/.proyect/bin/python /home/ec2-user/vul4py/scripts/vul4py.py --workspace-root /home/ec2-user/vul4py/workspaces --cve-id GHSA-4r9r-ch6f-vxmx functional --target gpt_candidate
+[exit 0]
+[+] Functional GHSA-4r9r-ch6f-vxmx::gpt_candidate
+  rc=0
+
+$ /home/ec2-user/vul4py/.proyect/bin/python /home/ec2-user/vul4py/scripts/vul4py.py --workspace-root /home/ec2-user/vul4py/workspaces --cve-id GHSA-4r9r-ch6f-vxmx exploit --targets gpt_candidate
+[exit 0]
+[+] Exploit tests for GHSA-4r9r-ch6f-vxmx
+  gpt_candidate: rc=1
+
+[restore] /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable rev-parse HEAD
+[exit 0]
+58983e1c20973ac42f2df7ff15d7c8cd32f9b688
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable rev-parse --verify --quiet 58983e1c20973ac42f2df7ff15d7c8cd32f9b688^{commit}
+[exit 0]
+58983e1c20973ac42f2df7ff15d7c8cd32f9b688
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable checkout HEAD -- .
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable clean -fdx -e .venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/vulnerable status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+[restore] /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed rev-parse HEAD
+[exit 0]
+7f994d62084fe43f1cffdef2f9bae6923344ef53
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed rev-parse --verify --quiet 7f994d62084fe43f1cffdef2f9bae6923344ef53^{commit}
+[exit 0]
+7f994d62084fe43f1cffdef2f9bae6923344ef53
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]
+!! src/picklescan.egg-info/
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed checkout HEAD -- .
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed clean -fdx -e .venv
+[exit 0]
+$ git -C /home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed status --porcelain=v1 -z --ignored -- . :(exclude).venv
+[exit 0]

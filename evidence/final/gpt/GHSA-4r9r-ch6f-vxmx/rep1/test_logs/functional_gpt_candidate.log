@@ -1,0 +1,12 @@
+$ pytest -q --junitxml=/home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/logs/functional_gpt_candidate.junit.xml tests/__init__.py tests/test_scanner.py
+[exit 0]
+
+STDOUT:
+VENV_PY=/home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/gpt_candidate/.venv/bin/python
+VENV_PYTEST=/home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/gpt_candidate/.venv/bin/pytest
+GCC_BIN=/usr/bin/gcc
+..............                                                           [100%]
+14 passed in 1.50s
+
+STDERR:
+

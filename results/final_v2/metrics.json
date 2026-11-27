@@ -1,0 +1,319 @@
+{
+  "generated_at_utc": "2026-11-24T22:47:48.199149+00:00",
+  "bootstrap": {
+    "B": 10000,
+    "seed": 20261124,
+    "unit": "vulnerability (all repetitions resampled together)",
+    "interval": "percentile 95%"
+  },
+  "selection": {
+    "seed": 20261124,
+    "n_ok": 18,
+    "n_eligible": 17,
+    "n_excluded": 1,
+    "n_selected": 17,
+    "scan_status_counts": {
+      "NON_ORACLE": 1,
+      "UNEXPECTED": 49,
+      "OK": 18,
+      "INFRA_BROKEN": 30
+    },
+    "eligibility": "scan-ok",
+    "selected": [
+      "CVE-2018-7753",
+      "CVE-2021-32839",
+      "CVE-2022-3102",
+      "CVE-2023-30608",
+      "CVE-2023-47163",
+      "CVE-2023-6681",
+      "CVE-2024-28102",
+      "CVE-2024-4340",
+      "CVE-2024-53861",
+      "CVE-2024-6866",
+      "CVE-2025-43859",
+      "CVE-2025-46656",
+      "CVE-2025-59420",
+      "CVE-2025-59940",
+      "CVE-2025-61920",
+      "CVE-2025-62800",
+      "GHSA-4r9r-ch6f-vxmx"
+    ],
+    "excluded": [
+      {
+        "cve_id": "CVE-2025-6176",
+        "reason": "meta.json lists no new_code_files: the repair prompt would contain no source file"
+      }
+    ]
+  },
+  "models": {
+    "gpt": {
+      "model": "gpt-6-luna",
+      "N_total": 34,
+      "N_valid": 34,
+      "N_incomplete": 0,
+      "N_vulnerabilities": 17,
+      "sum_V": 3,
+      "sum_C": 34,
+      "sum_FA": 31,
+      "N_with_confidence": 34,
+      "metrics": {
+        "VRR": {
+          "estimate": 0.08823529411764706,
+          "ci_low": 0.0,
+          "ci_high": 0.23529411764705882,
+          "undefined_resamples": 0
+        },
+        "FAR": {
+          "estimate": 0.9117647058823529,
+          "ci_low": 0.7647058823529411,
+          "ci_high": 1.0,
+          "undefined_resamples": 0
+        },
+        "CR": {
+          "estimate": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0,
+          "undefined_resamples": 0
+        },
+        "FAR_always_claim": {
+          "estimate": 0.9117647058823529,
+          "ci_low": 0.7647058823529411,
+          "ci_high": 1.0,
+          "undefined_resamples": 0
+        },
+        "Precision": {
+          "estimate": 0.08823529411764708,
+          "ci_low": 0.0,
+          "ci_high": 0.23529411764705888,
+          "undefined_resamples": 0
+        },
+        "FAR_given_A1": {
+          "estimate": 0.7,
+          "ci_low": 0.3,
+          "ci_high": 1.0,
+          "undefined_resamples": 1
+        },
+        "Brier": {
+          "estimate": 0.703905882352941,
+          "ci_low": 0.5914376470588235,
+          "ci_high": 0.78908,
+          "undefined_resamples": 0
+        },
+        "ECE": {
+          "estimate": 0.7970588235294118,
+          "ci_low": 0.6738088235294116,
+          "ci_high": 0.8838235294117647,
+          "undefined_resamples": 0
+        },
+        "AUROC": {
+          "estimate": 0.978494623655914,
+          "ci_low": 0.9242424242424242,
+          "ci_high": 1.0,
+          "undefined_resamples": 1168
+        }
+      },
+      "latency_s": {
+        "mean": 22.855799064916724,
+        "median": 20.340450048446655,
+        "p90": 38.21266198158264,
+        "n": 34,
+        "mean_ci": {
+          "ci_low": 17.48926609789624,
+          "ci_high": 29.261067955283554,
+          "undefined_resamples": 0
+        }
+      },
+      "mean_output_tokens": 3185.264705882353,
+      "mean_reasoning_tokens": 2822.3529411764707,
+      "generation_status_counts": {
+        "ok": 34
+      },
+      "outcome_counts": {
+        "patch does not apply": 24,
+        "verified repair": 3,
+        "security test fails (functionality preserved)": 5,
+        "breaks functionality and security test fails": 2
+      },
+      "outcome_categories": {
+        "infrastructure (incomplete)": 0,
+        "no valid answer": 0,
+        "patch does not apply": 24,
+        "functional and security tests fail": 2,
+        "only functional tests fail": 0,
+        "only security tests fail": 5,
+        "verified repair": 3
+      },
+      "VRR_given_A1": {
+        "estimate": 0.3,
+        "ci_low": 0.0,
+        "ci_high": 0.7142857142857143,
+        "undefined_resamples": 1
+      },
+      "confidence": {
+        "N_P": 34,
+        "mean": 0.8852941176470589,
+        "min": 0.65,
+        "max": 0.99
+      },
+      "latency_min_s": 5.597079277038574,
+      "latency_max_s": 68.17547655105591,
+      "model_returned": [
+        "gpt-6-luna"
+      ]
+    },
+    "deepseek": {
+      "model": "deepseek-flash",
+      "N_total": 34,
+      "N_valid": 34,
+      "N_incomplete": 0,
+      "N_vulnerabilities": 17,
+      "sum_V": 4,
+      "sum_C": 33,
+      "sum_FA": 29,
+      "N_with_confidence": 33,
+      "metrics": {
+        "VRR": {
+          "estimate": 0.11764705882352941,
+          "ci_low": 0.0,
+          "ci_high": 0.2647058823529412,
+          "undefined_resamples": 0
+        },
+        "FAR": {
+          "estimate": 0.8787878787878788,
+          "ci_low": 0.7272727272727273,
+          "ci_high": 1.0,
+          "undefined_resamples": 0
+        },
+        "CR": {
+          "estimate": 0.9705882352941176,
+          "ci_low": 0.9117647058823529,
+          "ci_high": 1.0,
+          "undefined_resamples": 0
+        },
+        "FAR_always_claim": {
+          "estimate": 0.8823529411764706,
+          "ci_low": 0.7352941176470589,
+          "ci_high": 1.0,
+          "undefined_resamples": 0
+        },
+        "Precision": {
+          "estimate": 0.12121212121212122,
+          "ci_low": 0.0,
+          "ci_high": 0.2727272727272727,
+          "undefined_resamples": 0
+        },
+        "FAR_given_A1": {
+          "estimate": 0.8518518518518519,
+          "ci_low": 0.68,
+          "ci_high": 1.0,
+          "undefined_resamples": 0
+        },
+        "Brier": {
+          "estimate": 0.6406727272727273,
+          "ci_low": 0.5247118181818181,
+          "ci_high": 0.7416739639037432,
+          "undefined_resamples": 0
+        },
+        "ECE": {
+          "estimate": 0.738181818181818,
+          "ci_low": 0.6027236070381231,
+          "ci_high": 0.8443792613636363,
+          "undefined_resamples": 0
+        },
+        "AUROC": {
+          "estimate": 0.8706896551724138,
+          "ci_low": 0.72975,
+          "ci_high": 0.953125,
+          "undefined_resamples": 371
+        }
+      },
+      "latency_s": {
+        "mean": 107.65930007485782,
+        "median": 83.62939822673798,
+        "p90": 177.0195061445236,
+        "n": 34,
+        "mean_ci": {
+          "ci_low": 82.87587523986312,
+          "ci_high": 133.39546274875892,
+          "undefined_resamples": 0
+        }
+      },
+      "mean_output_tokens": 22942.91176470588,
+      "mean_reasoning_tokens": 22615.79411764706,
+      "generation_status_counts": {
+        "ok": 33,
+        "truncated": 1
+      },
+      "outcome_counts": {
+        "patch does not apply": 6,
+        "security test fails (functionality preserved)": 18,
+        "breaks functionality and security test fails": 3,
+        "verified repair": 4,
+        "breaks functionality (security test passes)": 2,
+        "no usable answer: truncated": 1
+      },
+      "outcome_categories": {
+        "infrastructure (incomplete)": 0,
+        "no valid answer": 1,
+        "patch does not apply": 6,
+        "functional and security tests fail": 3,
+        "only functional tests fail": 2,
+        "only security tests fail": 18,
+        "verified repair": 4
+      },
+      "VRR_given_A1": {
+        "estimate": 0.14814814814814814,
+        "ci_low": 0.0,
+        "ci_high": 0.32142857142857145,
+        "undefined_resamples": 0
+      },
+      "confidence": {
+        "N_P": 33,
+        "mean": 0.8593939393939395,
+        "min": 0.6,
+        "max": 0.95
+      },
+      "latency_min_s": 26.271045684814453,
+      "latency_max_s": 328.7070906162262,
+      "model_returned": [
+        "deepseek-flash"
+      ]
+    }
+  },
+  "differences": {
+    "VRR: gpt - deepseek": {
+      "estimate": -0.029411764705882346,
+      "ci_low": -0.08823529411764706,
+      "ci_high": 0.0,
+      "undefined_resamples": 0
+    },
+    "FAR: gpt - deepseek": {
+      "estimate": 0.03297682709447414,
+      "ci_low": 0.0,
+      "ci_high": 0.09742647058823528,
+      "undefined_resamples": 0
+    },
+    "CR: gpt - deepseek": {
+      "estimate": 0.02941176470588236,
+      "ci_low": 0.0,
+      "ci_high": 0.08823529411764708,
+      "undefined_resamples": 0
+    },
+    "Brier: gpt - deepseek": {
+      "estimate": 0.06323315508021377,
+      "ci_low": 0.0067483110516935495,
+      "ci_high": 0.12830643797438332,
+      "undefined_resamples": 0
+    }
+  },
+  "exclusions_by_control": [
+    {
+      "control": "not_buildable (no new_code_files)",
+      "ok_cases_failing": "1"
+    },
+    {
+      "control": "any (excluded cases)",
+      "ok_cases_failing": "1"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+--- a/src/picklescan/scanner.py
++++ b/src/picklescan/scanner.py
+@@ -141,7 +141,8 @@
+     "pydoc": "pipepager",  # pydoc.pipepager('help','echo pwned')
+     "timeit": "*",
+     "torch._inductor.codecache": "compile_file",  # compile_file('', '', ['sh', '-c','$(echo pwned)'])
+     "torch.serialization": "load",  # pickle could be used to load a different file
++    "torch.storage": "_load_from_bytes",  # loads pickle data from bytes, allowing arbitrary code execution
+     "venv": "*",
+     "webbrowser": "*",  # Includes webbrowser.open()
+ }

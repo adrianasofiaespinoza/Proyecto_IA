@@ -1,0 +1,73 @@
+{
+  "cve_id": "GHSA-hfmc-7525-mj55",
+  "repo_url": "https://github.com/ronf/asyncssh",
+  "fix_commit": "0bc73254f41acb140187e0c89606311f88de5b7b",
+  "vulnerable_ref": "a788cfbb0326e2364f33aa9e1cb6c0df9e254510",
+  "fixed_ref": "0bc73254f41acb140187e0c89606311f88de5b7b",
+  "versions": {
+    "vulnerable": {
+      "git_ref": "a788cfbb0326e2364f33aa9e1cb6c0df9e254510"
+    },
+    "fixed": {
+      "git_ref": "0bc73254f41acb140187e0c89606311f88de5b7b"
+    }
+  },
+  "python_version": "3.11",
+  "install_cmds": [
+    "python -m pip install -U pip wheel",
+    "pip install -e ."
+  ],
+  "functional_test_cmd_base": "pytest -q",
+  "baseline_test_files": [
+    "tests/__init__.py",
+    "tests/gss_stub.py",
+    "tests/keysign_stub.py",
+    "tests/test_asn1.py",
+    "tests/test_compression.py",
+    "tests/test_editor.py",
+    "tests/test_encryption.py",
+    "tests/test_mac.py",
+    "tests/test_packet.py",
+    "tests/test_subprocess.py",
+    "tests/gssapi_stub.py",
+    "tests/pkcs11_stub.py",
+    "tests/server.py",
+    "tests/sk_stub.py",
+    "tests/sspi_stub.py",
+    "tests/test_agent.py",
+    "tests/test_auth.py",
+    "tests/test_auth_keys.py",
+    "tests/test_channel.py",
+    "tests/test_config.py",
+    "tests/test_connection.py",
+    "tests/test_connection_auth.py",
+    "tests/test_forward.py",
+    "tests/test_kex.py",
+    "tests/test_known_hosts.py",
+    "tests/test_logging.py",
+    "tests/test_pkcs11.py",
+    "tests/test_process.py",
+    "tests/test_public_key.py",
+    "tests/test_saslprep.py",
+    "tests/test_sftp.py",
+    "tests/test_sk.py",
+    "tests/test_stream.py",
+    "tests/test_x11.py",
+    "tests/test_x509.py",
+    "tests/util.py"
+  ],
+  "exploit_test_cmd_base": "pytest -q",
+  "new_test_files": [
+    "tests/test_connection.py",
+    "tests/test_connection_auth.py",
+    "tests/util.py"
+  ],
+  "new_code_files": [
+    "asyncssh/connection.py"
+  ],
+  "exploit_expectation": {
+    "vulnerable_should_fail": true,
+    "fixed_should_pass": true
+  },
+  "notes": ""
+}

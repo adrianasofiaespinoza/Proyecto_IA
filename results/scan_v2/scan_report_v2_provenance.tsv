@@ -1,0 +1,99 @@
+cve_id	status	provenance
+CVE-2017-16615	NON_ORACLE	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2017-16618	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2018-7753	OK	rescanned 2026-11-24 (after meta overrides)
+CVE-2019-1010017	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2019-10800	UNEXPECTED	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2020-6802	UNEXPECTED	scanned 2026-11-24
+CVE-2021-23980	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2021-28363	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2021-32839	OK	scanned 2026-11-24
+CVE-2022-24065	INFRA_BROKEN	scanned 2026-11-24
+CVE-2022-24439	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2022-2888	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2022-29217	UNEXPECTED	scanned 2026-11-24
+CVE-2022-3102	OK	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2023-23934	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2023-25577	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2023-26145	INFRA_BROKEN	scanned 2026-11-24
+CVE-2023-26302	UNEXPECTED	scanned 2026-11-24
+CVE-2023-29483	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2023-30608	OK	scanned 2026-11-24
+CVE-2023-32303	INFRA_BROKEN	scanned 2026-11-24
+CVE-2023-32309	UNEXPECTED	scanned 2026-11-24
+CVE-2023-32681	UNEXPECTED	scanned 2026-11-24
+CVE-2023-34457	INFRA_BROKEN	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2023-36830	INFRA_BROKEN	scanned 2026-11-24
+CVE-2023-37271	UNEXPECTED	scanned 2026-11-24
+CVE-2023-41039	UNEXPECTED	scanned 2026-11-24
+CVE-2023-41040	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2023-46446	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2023-47163	OK	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2023-6681	OK	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2024-22190	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2024-22195	UNEXPECTED	scanned 2026-11-24
+CVE-2024-27454	INFRA_BROKEN	scanned 2026-11-24
+CVE-2024-28102	OK	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2024-29033	INFRA_BROKEN	scanned 2026-11-24
+CVE-2024-32977	INFRA_BROKEN	scanned 2026-11-24
+CVE-2024-34061	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2024-34064	UNEXPECTED	scanned 2026-11-24
+CVE-2024-34078	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2024-35195	UNEXPECTED	scanned 2026-11-24
+CVE-2024-37891	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2024-42353	UNEXPECTED	scanned 2026-11-24
+CVE-2024-4340	OK	scanned 2026-11-24
+CVE-2024-47532	UNEXPECTED	scanned 2026-11-24
+CVE-2024-47874	INFRA_BROKEN	scanned 2026-11-24
+CVE-2024-49768	INFRA_BROKEN	scanned 2026-11-24
+CVE-2024-51998	INFRA_BROKEN	scanned 2026-11-24
+CVE-2024-52303	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2024-52804	UNEXPECTED	scanned 2026-11-24
+CVE-2024-53848	INFRA_BROKEN	scanned 2026-11-24
+CVE-2024-53861	OK	rescanned 2026-11-24 (after meta overrides)
+CVE-2024-53865	UNEXPECTED	scanned 2026-11-24
+CVE-2024-53981	UNEXPECTED	scanned 2026-11-24
+CVE-2024-55655	UNEXPECTED	scanned 2026-11-24
+CVE-2024-56201	UNEXPECTED	scanned 2026-11-24
+CVE-2024-56326	UNEXPECTED	scanned 2026-11-24
+CVE-2024-6844	UNEXPECTED	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2024-6866	OK	scanned 2026-11-24
+CVE-2024-9701	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-10157	UNEXPECTED	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2025-1716	UNEXPECTED	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2025-1944	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-22153	UNEXPECTED	scanned 2026-11-24
+CVE-2025-24359	INFRA_BROKEN	scanned 2026-11-24
+CVE-2025-27516	UNEXPECTED	scanned 2026-11-24
+CVE-2025-43859	OK	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2025-46656	OK	rescanned 2026-11-24 (replaces 2026-10-19 row)
+CVE-2025-47287	UNEXPECTED	scanned 2026-11-24
+CVE-2025-48383	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-48994	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-50181	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-5120	UNEXPECTED	scanned 2026-11-24
+CVE-2025-53365	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-53366	INFRA_BROKEN	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-54121	INFRA_BROKEN	scanned 2026-11-24
+CVE-2025-54413	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-54886	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-57804	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-58180	INFRA_BROKEN	scanned 2026-11-24
+CVE-2025-58367	INFRA_BROKEN	scanned 2026-11-24
+CVE-2025-58438	INFRA_BROKEN	scanned 2026-11-24
+CVE-2025-59420	OK	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-59940	OK	scanned 2026-11-24
+CVE-2025-6176	OK	scanned 2026-11-24
+CVE-2025-61765	UNEXPECTED	scanned 2026-11-24
+CVE-2025-61920	OK	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-62708	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+CVE-2025-62727	INFRA_BROKEN	scanned 2026-11-24
+CVE-2025-62800	OK	rescanned 2026-11-24 (after meta overrides)
+GHSA-3gf5-cxq9-w223	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+GHSA-3vg9-h568-4w9m	UNEXPECTED	rescanned 2026-11-24 (replaces 2026-10-19 row)
+GHSA-4r9r-ch6f-vxmx	OK	rescanned 2026-11-24 (after meta overrides)
+GHSA-753j-mpmx-qq6g	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+GHSA-9gvj-pp9x-gcfr	UNEXPECTED	rescanned 2026-11-24 (replaces 2026-10-19 row)
+GHSA-hfmc-7525-mj55	UNEXPECTED	scanned 2026-11-24
+GHSA-vhmj-5q9r-mm9g	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)
+GHSA-w235-7p84-xx57	UNEXPECTED	rescanned 2026-11-24 (after meta overrides)

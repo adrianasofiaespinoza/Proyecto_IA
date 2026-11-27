@@ -1,0 +1,12 @@
+{
+  "frozen_at_utc": "2026-11-24T20:13:33.282481+00:00",
+  "sha256": {
+    "system_prompt.txt": "61c66e6e5fe8c99f1db74f9a402e67ad8570c87bfa5933378ddb976db66b1e3c",
+    "prompt.txt": "6e06fc731427c33b2adeed57895539d4ee2c8cdef2c257f3ea7f71dac927b0b7",
+    "raw_api_response.json": "636a1bb03eef7d5dd30c1b14c1b4fd1adb855d54e4bd7ed4fd80b18a794680b3",
+    "llm_response.json": "06ee8d5fc3b2afd84e4881a8b06634f4c0358a10e136338243865215a5d62be0",
+    "patch.diff": "6784a3f417b8f794ce5dd3faff82651b7f223f99f41217222af12673f87d76db",
+    "api_attempts.json": "5b1fe2a293ca63b015a7209fe3bb5425eedd03363f520d3af66831cfd299be74",
+    "generation.json": "a876327c9b62ef48dc815d95540316c8d1e68333db0ae098c2abf6a9f644967a"
+  }
+}

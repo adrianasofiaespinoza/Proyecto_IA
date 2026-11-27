@@ -1,0 +1,11 @@
+{
+  "raw_text": "{\"diff\":\"--- a/src/picklescan/scanner.py\\n+++ b/src/picklescan/scanner.py\\n@@ -141,7 +141,8 @@\\n     \\\"pydoc\\\": \\\"pipepager\\\",  # pydoc.pipepager('help','echo pwned')\\n     \\\"timeit\\\": \\\"*\\\",\\n     \\\"torch._inductor.codecache\\\": \\\"compile_file\\\",  # compile_file('', '', ['sh', '-c','$(echo pwned)'])\\n     \\\"torch.serialization\\\": \\\"load\\\",  # pickle could be used to load a different file\\n+    \\\"torch.storage\\\": \\\"_load_from_bytes\\\",  # loads pickle data from bytes, allowing arbitrary code execution\\n     \\\"venv\\\": \\\"*\\\",\\n     \\\"webbrowser\\\": \\\"*\\\",  # Includes webbrowser.open()\\n }\\n\",\"claimed_success\":1,\"confidence\":0.88}",
+  "parse_error": null,
+  "signals": {
+    "refusal": false,
+    "truncated": false
+  },
+  "diff": "--- a/src/picklescan/scanner.py\n+++ b/src/picklescan/scanner.py\n@@ -141,7 +141,8 @@\n     \"pydoc\": \"pipepager\",  # pydoc.pipepager('help','echo pwned')\n     \"timeit\": \"*\",\n     \"torch._inductor.codecache\": \"compile_file\",  # compile_file('', '', ['sh', '-c','$(echo pwned)'])\n     \"torch.serialization\": \"load\",  # pickle could be used to load a different file\n+    \"torch.storage\": \"_load_from_bytes\",  # loads pickle data from bytes, allowing arbitrary code execution\n     \"venv\": \"*\",\n     \"webbrowser\": \"*\",  # Includes webbrowser.open()\n }\n",
+  "claimed_success": 1,
+  "confidence": 0.88
+}

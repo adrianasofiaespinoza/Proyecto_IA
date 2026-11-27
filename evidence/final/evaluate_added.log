@@ -1,0 +1,10 @@
+[eval] 2026-11-24T22:46:35Z gpt CVE-2024-28102
+  gpt/CVE-2024-28102/rep1: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+  gpt/CVE-2024-28102/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 2/2 evaluated; {'complete': 2}
+[eval] 2026-11-24T22:46:36Z deepseek CVE-2024-28102
+  deepseek/CVE-2024-28102/rep1: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+  deepseek/CVE-2024-28102/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 2/2 evaluated; {'complete': 2}
+[eval] CVE-2024-28102 venvs wiped; disk: 20G free
+[done] 2026-11-24T22:47:29Z

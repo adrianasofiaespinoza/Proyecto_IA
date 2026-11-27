@@ -1,0 +1,66 @@
+$ pip install -e .
+[exit 0]
+
+STDOUT:
+VENV_PY=/home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed/.venv/bin/python
+VENV_PYTEST=/home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed/.venv/bin/pytest
+GCC_BIN=/usr/bin/gcc
+Obtaining file:///home/ec2-user/vul4py/workspaces/GHSA-4r9r-ch6f-vxmx/fixed
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: picklescan
+  Building editable for picklescan (pyproject.toml): started
+  Building editable for picklescan (pyproject.toml): finished with status 'done'
+  Created wheel for picklescan: filename=picklescan-0.0.28-0.editable-py3-none-any.whl size=10721 sha256=3ad2dddc4c8c146f70f4deafecdf0c3afd0a4e0c6405ea4bb99899ad4b499a98
+  Stored in directory: /tmp/pip-ephem-wheel-cache-6rojrzp3/wheels/c2/5e/5b/cfc64a9aeeefdfa4ccf7e27d41227a7e3e30623610cbf72fe3
+Successfully built picklescan
+Installing collected packages: picklescan
+Successfully installed picklescan-0.0.28
+
+STDERR:
+  /tmp/pip-build-env-lqbxm9rc/overlay/lib/python3.11/site-packages/setuptools/dist.py:765: BuildBackendWarning: License classifiers are deprecated.
+  !!
+  
+          ********************************************************************************
+          Please consider removing the following classifiers in favor of a SPDX license expression:
+  
+          License :: OSI Approved :: MIT License
+  
+          See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+          ********************************************************************************
+  
+  !!
+    self._finalize_license_expression()
+  /tmp/pip-build-env-lqbxm9rc/overlay/lib/python3.11/site-packages/setuptools/dist.py:765: BuildBackendWarning: License classifiers are deprecated.
+  !!
+  
+          ********************************************************************************
+          Please consider removing the following classifiers in favor of a SPDX license expression:
+  
+          License :: OSI Approved :: MIT License
+  
+          See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+          ********************************************************************************
+  
+  !!
+    self._finalize_license_expression()
+  /tmp/pip-build-env-lqbxm9rc/overlay/lib/python3.11/site-packages/setuptools/dist.py:765: BuildBackendWarning: License classifiers are deprecated.
+  !!
+  
+          ********************************************************************************
+          Please consider removing the following classifiers in favor of a SPDX license expression:
+  
+          License :: OSI Approved :: MIT License
+  
+          See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+          ********************************************************************************
+  
+  !!
+    self._finalize_license_expression()
+

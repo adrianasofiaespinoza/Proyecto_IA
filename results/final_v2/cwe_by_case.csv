@@ -1,0 +1,18 @@
+case,ghsa,n_advisories,cwes
+CVE-2018-7753,GHSA-m9mq-p2f9-cfqv,1,CWE-20 Improper Input Validation
+CVE-2021-32839,GHSA-p5w8-wqhj-9hhf,1,CWE-400 Uncontrolled Resource Consumption
+CVE-2022-3102,GHSA-gwp4-mcv4-w95j,1,(none listed)
+CVE-2023-30608,GHSA-rrm6-wvj7-cwh2,1,CWE-1333 Inefficient Regular Expression Complexity
+CVE-2023-47163,GHSA-gw7g-qr8w-3448,1,CWE-400 Uncontrolled Resource Consumption | CWE-674 Uncontrolled Recursion
+CVE-2023-6681,GHSA-cw2r-4p82-qv79,1,CWE-400 Uncontrolled Resource Consumption
+CVE-2024-28102,GHSA-j857-7rvv-vj97,1,CWE-770 Allocation of Resources Without Limits or Throttling
+CVE-2024-4340,GHSA-2m57-hf25-phgg,1,CWE-674 Uncontrolled Recursion
+CVE-2024-53861,GHSA-75c5-xw7c-p5pm,1,CWE-697 Incorrect Comparison
+CVE-2024-6866,GHSA-43qf-4rqw-9q2g,1,CWE-178 Improper Handling of Case Sensitivity
+CVE-2025-43859,GHSA-vqfr-h8mv-ghfj,1,CWE-444 Inconsistent Interpretation of HTTP Requests
+CVE-2025-46656,GHSA-7mpr-5m44-h73r,1,CWE-1284 Improper Validation of Specified Quantity in Input
+CVE-2025-59420,GHSA-9ggr-2464-2j32,1,CWE-345 Insufficient Verification of Data Authenticity | CWE-863 Incorrect Authorization
+CVE-2025-59940,GHSA-v39m-5m9j-m9w9,1,CWE-20 Improper Input Validation
+CVE-2025-61920,GHSA-pq5p-34cr-23v9,1,CWE-20 Improper Input Validation | CWE-400 Uncontrolled Resource Consumption | CWE-770 Allocation of Resources Without Limits or Throttling
+CVE-2025-62800,GHSA-mxxr-jv3v-6pgc,1,CWE-79 Improper Neutralization of Input During Web Page Generation
+GHSA-4r9r-ch6f-vxmx,GHSA-4r9r-ch6f-vxmx,1,CWE-345 Insufficient Verification of Data Authenticity

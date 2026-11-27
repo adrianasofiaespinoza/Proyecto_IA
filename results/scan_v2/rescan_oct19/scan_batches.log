@@ -1,0 +1,7 @@
+[batch 1] 2026-11-24T22:33:37Z 7 cases: CVE-2017-16615,CVE-2019-10800,CVE-2022-3102,CVE-2023-34457,CVE-2023-47163,CVE-2023-6681,CVE-2024-28102
+[batch 1] scan exit=0
+[batch 1] venvs wiped; disk: 20G free
+[batch 2] 2026-11-24T22:35:51Z 7 cases: CVE-2024-6844,CVE-2025-10157,CVE-2025-1716,CVE-2025-43859,CVE-2025-46656,GHSA-3vg9-h568-4w9m,GHSA-9gvj-pp9x-gcfr
+[batch 2] scan exit=0
+[batch 2] venvs wiped; disk: 20G free
+[done] 2026-11-24T22:37:28Z

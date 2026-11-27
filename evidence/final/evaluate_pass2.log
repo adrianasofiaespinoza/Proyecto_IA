@@ -1,0 +1,146 @@
+[eval] 2026-11-24T20:45:51Z gpt CVE-2018-7753
+[!] gpt/CVE-2018-7753: runs/final/gpt/CVE-2018-7753/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+[!] gpt/CVE-2018-7753: runs/final/gpt/CVE-2018-7753/rep2/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+[done] gpt: 0/2 evaluated; {}
+[eval] 2026-11-24T20:45:51Z deepseek CVE-2018-7753
+[!] deepseek/CVE-2018-7753: runs/final/deepseek/CVE-2018-7753/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2018-7753/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2018-7753 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:46:15Z gpt CVE-2021-32839
+[!] gpt/CVE-2021-32839: runs/final/gpt/CVE-2021-32839/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2021-32839/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:46:15Z deepseek CVE-2021-32839
+[!] deepseek/CVE-2021-32839: runs/final/deepseek/CVE-2021-32839/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2021-32839/rep2: status=complete gen=ok A=1 F=1 S=1 V=1 C=1 FA=0 (func_rc=0 expl_rc=0) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2021-32839 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:46:35Z gpt CVE-2022-3102
+[!] gpt/CVE-2022-3102: runs/final/gpt/CVE-2022-3102/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2022-3102/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:47:00Z deepseek CVE-2022-3102
+[!] deepseek/CVE-2022-3102: runs/final/deepseek/CVE-2022-3102/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2022-3102/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2022-3102 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:47:20Z gpt CVE-2023-30608
+[!] gpt/CVE-2023-30608: runs/final/gpt/CVE-2023-30608/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2023-30608/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:47:20Z deepseek CVE-2023-30608
+[!] deepseek/CVE-2023-30608: runs/final/deepseek/CVE-2023-30608/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2023-30608/rep2: status=complete gen=ok A=1 F=0 S=1 V=0 C=1 FA=1 (func_rc=1 expl_rc=0) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2023-30608 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:47:40Z gpt CVE-2023-47163
+[!] gpt/CVE-2023-47163: runs/final/gpt/CVE-2023-47163/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2023-47163/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:47:40Z deepseek CVE-2023-47163
+[!] deepseek/CVE-2023-47163: runs/final/deepseek/CVE-2023-47163/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2023-47163/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2023-47163 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:48:00Z gpt CVE-2023-6681
+[!] gpt/CVE-2023-6681: runs/final/gpt/CVE-2023-6681/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2023-6681/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:48:00Z deepseek CVE-2023-6681
+[!] deepseek/CVE-2023-6681: runs/final/deepseek/CVE-2023-6681/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2023-6681/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2023-6681 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:48:25Z gpt CVE-2024-4340
+[!] gpt/CVE-2024-4340: runs/final/gpt/CVE-2024-4340/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2024-4340/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:48:26Z deepseek CVE-2024-4340
+[!] deepseek/CVE-2024-4340: runs/final/deepseek/CVE-2024-4340/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2024-4340/rep2: status=complete gen=ok A=1 F=0 S=0 V=0 C=1 FA=1 (func_rc=1 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2024-4340 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:48:46Z gpt CVE-2024-53861
+[!] gpt/CVE-2024-53861: runs/final/gpt/CVE-2024-53861/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2024-53861/rep2: status=complete gen=ok A=1 F=1 S=1 V=1 C=1 FA=0 (func_rc=0 expl_rc=0) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:49:06Z deepseek CVE-2024-53861
+[!] deepseek/CVE-2024-53861: runs/final/deepseek/CVE-2024-53861/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2024-53861/rep2: status=complete gen=ok A=1 F=1 S=1 V=1 C=1 FA=0 (func_rc=0 expl_rc=0) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2024-53861 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:49:22Z gpt CVE-2024-6866
+[!] gpt/CVE-2024-6866: runs/final/gpt/CVE-2024-6866/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2024-6866/rep2: status=complete gen=ok A=1 F=0 S=0 V=0 C=1 FA=1 (func_rc=1 expl_rc=1) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:49:43Z deepseek CVE-2024-6866
+[!] deepseek/CVE-2024-6866: runs/final/deepseek/CVE-2024-6866/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2024-6866/rep2: status=complete gen=ok A=1 F=0 S=0 V=0 C=1 FA=1 (func_rc=1 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2024-6866 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:49:59Z gpt CVE-2025-43859
+[!] gpt/CVE-2025-43859: runs/final/gpt/CVE-2025-43859/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2025-43859/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:49:59Z deepseek CVE-2025-43859
+[!] deepseek/CVE-2025-43859: runs/final/deepseek/CVE-2025-43859/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2025-43859/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2025-43859 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:50:19Z gpt CVE-2025-46656
+[!] gpt/CVE-2025-46656: runs/final/gpt/CVE-2025-46656/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2025-46656/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:50:19Z deepseek CVE-2025-46656
+[!] deepseek/CVE-2025-46656: runs/final/deepseek/CVE-2025-46656/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2025-46656/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2025-46656 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:50:40Z gpt CVE-2025-59420
+[!] gpt/CVE-2025-59420: runs/final/gpt/CVE-2025-59420/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2025-59420/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:50:40Z deepseek CVE-2025-59420
+[!] deepseek/CVE-2025-59420: runs/final/deepseek/CVE-2025-59420/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2025-59420/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2025-59420 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:51:27Z gpt CVE-2025-59940
+[!] gpt/CVE-2025-59940: runs/final/gpt/CVE-2025-59940/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2025-59940/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:51:27Z deepseek CVE-2025-59940
+[!] deepseek/CVE-2025-59940: runs/final/deepseek/CVE-2025-59940/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2025-59940/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2025-59940 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:51:27Z gpt CVE-2025-61920
+[!] gpt/CVE-2025-61920: runs/final/gpt/CVE-2025-61920/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2025-61920/rep2: status=complete gen=ok A=1 F=0 S=0 V=0 C=1 FA=1 (func_rc=1 expl_rc=1) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:52:15Z deepseek CVE-2025-61920
+[!] deepseek/CVE-2025-61920: runs/final/deepseek/CVE-2025-61920/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2025-61920/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2025-61920 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:52:53Z gpt CVE-2025-62800
+[!] gpt/CVE-2025-62800: runs/final/gpt/CVE-2025-62800/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/CVE-2025-62800/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:53:44Z deepseek CVE-2025-62800
+[!] deepseek/CVE-2025-62800: runs/final/deepseek/CVE-2025-62800/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/CVE-2025-62800/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] CVE-2025-62800 venvs wiped; disk: 20G free
+[eval] 2026-11-24T20:54:25Z gpt GHSA-4r9r-ch6f-vxmx
+[!] gpt/GHSA-4r9r-ch6f-vxmx: runs/final/gpt/GHSA-4r9r-ch6f-vxmx/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  gpt/GHSA-4r9r-ch6f-vxmx/rep2: status=complete gen=ok A=0 F=0 S=0 V=0 C=1 FA=1 (func_rc=None expl_rc=None) 
+[done] gpt: 1/2 evaluated; {'complete': 1}
+[eval] 2026-11-24T20:54:25Z deepseek GHSA-4r9r-ch6f-vxmx
+[!] deepseek/GHSA-4r9r-ch6f-vxmx: runs/final/deepseek/GHSA-4r9r-ch6f-vxmx/rep1/eval.json already exists; refusing to overwrite (use --out-dir for a new evaluation).
+  deepseek/GHSA-4r9r-ch6f-vxmx/rep2: status=complete gen=ok A=1 F=1 S=0 V=0 C=1 FA=1 (func_rc=0 expl_rc=1) 
+[done] deepseek: 1/2 evaluated; {'complete': 1}
+[eval] GHSA-4r9r-ch6f-vxmx venvs wiped; disk: 20G free
+[done] 2026-11-24T20:55:23Z
+EXIT=0

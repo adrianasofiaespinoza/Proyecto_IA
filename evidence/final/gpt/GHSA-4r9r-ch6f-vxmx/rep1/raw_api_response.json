@@ -1,0 +1,41 @@
+{
+  "id": "chatcmpl-EnrB10KeYjOFvGZ4AYizwYJUTqKGo",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\"diff\":\"--- a/src/picklescan/scanner.py\\n+++ b/src/picklescan/scanner.py\\n@@ -269,6 +269,8 @@ def _list_globals(data: IO[bytes], multiple_pickles=True) -> Set[Tuple[str, str]]:\\n             elif op_name in (\\\"GLOBAL\\\", \\\"INST\\\"):\\n                 globals.add(tuple(op_value.split(\\\" \\\", 1)))\\n+            elif op_name in (\\\"EXT1\\\", \\\"EXT2\\\", \\\"EXT4\\\"):\\n+                globals.add((\\\"unknown\\\", \\\"unknown\\\"))\\n             elif op_name == \\\"STACK_GLOBAL\\\":\\n                 values = []\\n                 for offset in range(1, n + 1):\\n\",\"claimed_success\":1,\"confidence\":0.83}",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": [],
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1795551191,
+  "model": "gpt-6-luna",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 3001,
+    "prompt_tokens": 5505,
+    "total_tokens": 8506,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 2794,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 5502,
+      "cached_tokens": 0
+    }
+  }
+}

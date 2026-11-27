@@ -1,0 +1,11 @@
+--- a/src/picklescan/scanner.py
++++ b/src/picklescan/scanner.py
+@@ -266,6 +266,9 @@ def _list_globals(data: IO[bytes], multiple_pickles=True) -> Set[Tuple[str, str]]:
+                 memo[op_value] = ops[n - 1][1]
++            elif op_name in ("EXT1", "EXT2", "EXT4"):
++                # Extension opcodes resolve globals through the unpickler's
++                # extension registry, so their target cannot be determined here.
++                globals.add(("unknown", "unknown"))
+             elif op_name in ("GLOBAL", "INST"):
+                 globals.add(tuple(op_value.split(" ", 1)))
+*** End Patch

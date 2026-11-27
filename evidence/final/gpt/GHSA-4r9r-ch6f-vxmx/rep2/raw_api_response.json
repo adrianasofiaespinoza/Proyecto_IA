@@ -1,0 +1,41 @@
+{
+  "id": "chatcmpl-EnrfCM7k2Xk7ohx6G2aXUNFvcNtY3",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\"diff\":\"--- a/src/picklescan/scanner.py\\n+++ b/src/picklescan/scanner.py\\n@@ -266,6 +266,9 @@ def _list_globals(data: IO[bytes], multiple_pickles=True) -> Set[Tuple[str, str]]:\\n                 memo[op_value] = ops[n - 1][1]\\n+            elif op_name in (\\\"EXT1\\\", \\\"EXT2\\\", \\\"EXT4\\\"):\\n+                # Extension opcodes resolve globals through the unpickler's\\n+                # extension registry, so their target cannot be determined here.\\n+                globals.add((\\\"unknown\\\", \\\"unknown\\\"))\\n             elif op_name in (\\\"GLOBAL\\\", \\\"INST\\\"):\\n                 globals.add(tuple(op_value.split(\\\" \\\", 1)))\\n*** End Patch\",\"claimed_success\":1,\"confidence\":0.78}",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": [],
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null
+      }
+    }
+  ],
+  "created": 1795553062,
+  "model": "gpt-6-luna",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 3242,
+    "prompt_tokens": 5505,
+    "total_tokens": 8747,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 3017,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 5502,
+      "cached_tokens": 0
+    }
+  }
+}
