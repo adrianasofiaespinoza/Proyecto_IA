@@ -16,9 +16,6 @@ HERE = Path(__file__).resolve().parent.parent
 WORKSPACES = HERE / "workspaces"
 RUNS = HERE / "runs"
 
-# Study models (see README.md): gpt-6-luna and deepseek-flash.
-# reasoning-effort values accepted per provider (from each provider's docs); values
-# that a provider would silently remap (e.g. DeepSeek medium -> high) are rejected.
 PROVIDERS = {
     "gpt": {"provider": "openai", "key_env": "OPENAI_API_KEY", "base_url": None,
             "max_tokens_param": "max_completion_tokens",
