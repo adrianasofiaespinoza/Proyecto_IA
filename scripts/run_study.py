@@ -63,7 +63,7 @@ def main():
                     continue
                 log(f"[{k}/{total}] {agent} {vid} rep{rep}")
                 rc = ra.run_builtin(agent, model, vid, rep, args.workspaces / vid, out_dir,
-                                    "v2", None, ra.DEFAULT_MAX_OUTPUT_TOKENS,
+                                    None, ra.DEFAULT_MAX_OUTPUT_TOKENS,
                                     ra.DEFAULT_REASONING_EFFORT)
                 label = {0: "ok", 4: "no_usable_answer", 5: "api_error_exhausted"}.get(rc, f"rc_{rc}")
                 counts[f"{agent}:{label}"] = counts.get(f"{agent}:{label}", 0) + 1

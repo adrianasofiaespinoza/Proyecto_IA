@@ -22,9 +22,7 @@ Tested on Amazon Linux 2023 (EC2).
     python -m pip install -r requirements.txt
 
 The `.proyect` venv that runs the experiment scripts uses Python 3.9 (the system `python3.9`); the
-benchmark projects themselves run on interpreters that Vul4Py provisions separately. Because the venv is
-Python 3.9, `requirements.txt` pins `anthropic==0.125.0`, the last Anthropic SDK release that
-supports it (the 1.x series requires Python 3.10 or newer).
+benchmark projects themselves run on interpreters that Vul4Py provisions separately.
 
 API keys are provided only through environment variables and are never stored in the repository:
 

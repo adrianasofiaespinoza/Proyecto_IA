@@ -13,21 +13,20 @@ One attempt per (agent, vuln_id, repetition). Output directory:
         generation.json         model, tokens, latency_ms, timestamp, status, error, settings
         frozen.json             SHA-256 of every file above; files set read-only
 
-Agents (all receive exactly the same prompts):
+Agents (both receive exactly the same prompts):
     gpt       OpenAI Chat Completions          key: OPENAI_API_KEY     study model: gpt-6-luna
     deepseek  DeepSeek (OpenAI-compatible)     key: DEEPSEEK_API_KEY   study model: deepseek-flash
-    claude    Anthropic Messages (streamed)    key: ANTHROPIC_API_KEY
 
 Study settings, always sent explicitly and recorded in generation.json["settings"]:
-    reasoning effort  high    (gpt/deepseek: reasoning_effort; claude: output_config.effort)
-    output limit      64000   (gpt: max_completion_tokens; deepseek/claude: max_tokens)
+    reasoning effort  high    (reasoning_effort)
+    output limit      64000   (gpt: max_completion_tokens; deepseek: max_tokens)
 Reasoning levels are named alike but are not calibrated identically across providers.
 Each call's request/response times are stored as ISO-8601 UTC (request_utc, response_utc).
 
 Generation status recorded in generation.json:
     ok                   JSON parsed: diff, claimed_success and confidence are valid
-    refusal              the API reports a refusal (Anthropic stop_reason "refusal",
-                         OpenAI-style message.refusal or finish_reason "content_filter")
+    refusal              the API reports a refusal (message.refusal or
+                         finish_reason "content_filter")
     truncated            output cut by the token limit and not parseable
     parse_error          any other unparseable answer
     api_error_exhausted  no response after MAX_API_RETRIES retries (infrastructure)
@@ -42,7 +41,7 @@ Other HTTP errors (400/401/403/404/...) are configuration errors: nothing is fro
 and the whole run stops. The SDKs' own automatic retries are disabled
 (max_retries=0) so that every call is visible in the log.
 
-Latency (identical definition for the three providers): wall-clock time from just
+Latency (identical definition for both providers): wall-clock time from just
 before the request is sent until the complete response has been received.
 
 The LLM only sees the vulnerable source and the fixed prompt. Verification
@@ -73,16 +72,11 @@ PROVIDERS = {
     "gpt": {"provider": "openai", "key_env": "OPENAI_API_KEY", "base_url": None,
             "max_tokens_param": "max_completion_tokens",
             "efforts": ("none", "low", "medium", "high", "xhigh", "max")},
-    "claude": {"provider": "anthropic", "key_env": "ANTHROPIC_API_KEY", "base_url": None,
-               "max_tokens_param": "max_tokens",
-               "efforts": ("low", "medium", "high", "xhigh", "max")},
     "deepseek": {"provider": "deepseek", "key_env": "DEEPSEEK_API_KEY",
                  "base_url": "https://api.deepseek.com",
                  "max_tokens_param": "max_tokens",
                  "efforts": ("none", "low", "high", "max")},
 }
-BUILTIN = set(PROVIDERS)
-EXTERNAL = {"openhands", "trae", "swe"}
 
 MAX_API_RETRIES = 3                 # retries after the first call -> at most 4 calls
 RETRY_BACKOFF_S = (15, 60, 180)     # wait before retry 1, 2, 3
@@ -91,26 +85,17 @@ RETRYABLE_STATUS = {408, 409, 429}  # plus every status >= 500
 DEFAULT_MAX_OUTPUT_TOKENS = 64000   # common output limit (reasoning included where counted)
 DEFAULT_REASONING_EFFORT = "high"   # sent explicitly to every provider
 
-_COMMON_PROMPT = (
+# System prompt of the study (stored as prompt_version "v2" in generation.json).
+# Confidence = probability of passing the complete verification, independently
+# of the claim (see README.md).
+PROMPT_VERSION = "v2"
+SYSTEM_PROMPT = (
     "You are a security expert and a Python programmer. I will provide you with "
     "a vulnerable Python project (its source files). Respond with ONLY a JSON "
     "object, no prose and no markdown fences, with exactly these keys: "
     "\"diff\": a string containing a minimal unified diff that fixes the "
     "vulnerability, with paths relative to the repository root prefixed a/ and b/; "
-)
-# v1: prompt used in the pilot (kept verbatim for traceability).
-SYSTEM_PROMPT_V1 = (
-    _COMMON_PROMPT
-    + "\"claimed_success\": 1 if you claim the patch fixes the vulnerability while "
-    "preserving the existing functionality, otherwise 0; "
-    "\"confidence\": a number between 0 and 1 for your confidence in that claim. "
-    "You do not have access to the internet nor external tools."
-)
-# v2: full study. Confidence = probability of passing the complete verification,
-# independently of the claim (see README.md).
-SYSTEM_PROMPT_V2 = (
-    _COMMON_PROMPT
-    + "\"claimed_success\": 1 if you claim the patch eliminates the vulnerability "
+    "\"claimed_success\": 1 if you claim the patch eliminates the vulnerability "
     "without breaking the existing functionality, otherwise 0; "
     "\"confidence\": a number between 0 and 1 giving your estimated probability that "
     "the patch will pass the complete independent verification (the patch applies, "
@@ -118,7 +103,6 @@ SYSTEM_PROMPT_V2 = (
     "of the value you give to claimed_success. "
     "You do not have access to the internet nor external tools."
 )
-SYSTEM_PROMPTS = {"v1": SYSTEM_PROMPT_V1, "v2": SYSTEM_PROMPT_V2}
 
 
 class ConfigError(Exception):
@@ -228,46 +212,6 @@ def call_openai_compatible(agent: str, system: str, prompt: str, model: str,
         "truncated": finish == "length",
     }
     return text, info, resp.model_dump(mode="json"), signals
-
-
-def call_anthropic(system: str, prompt: str, model: str, effort: Optional[str],
-                   max_tokens: int):
-    import anthropic  # lazy
-    client = anthropic.Anthropic(api_key=os.environ[PROVIDERS["claude"]["key_env"]],
-                                 timeout=REQUEST_TIMEOUT_S, max_retries=0)
-    kwargs = {}
-    if effort:
-        kwargs["output_config"] = {"effort": effort}
-    # No `fallbacks`: a refusal must stay a refusal of this model, not be answered
-    # by another model. No temperature (rejected by current Claude models).
-    t_request = time.time()
-    with client.messages.stream(
-        model=model,
-        max_tokens=max_tokens,
-        system=system,
-        messages=[{"role": "user", "content": prompt}],
-        **kwargs,
-    ) as stream:
-        msg = stream.get_final_message()
-    t_response = time.time()
-    text = "".join(b.text for b in msg.content if b.type == "text")
-    stop_details = msg.stop_details.model_dump(mode="json") if msg.stop_details else None
-    info = {
-        "model_returned": msg.model,
-        "input_tokens": msg.usage.input_tokens,
-        "output_tokens": msg.usage.output_tokens,
-        "reasoning_tokens": None,  # not reported separately by the Messages API
-        "stop_reason": msg.stop_reason,
-        "stop_details": stop_details,
-        "request_utc": _iso(t_request),
-        "response_utc": _iso(t_response),
-        "t_request": t_request,
-        "t_response": t_response,
-        "latency_ms": 1000.0 * (t_response - t_request),
-    }
-    signals = {"refusal": msg.stop_reason == "refusal",
-               "truncated": msg.stop_reason == "max_tokens"}
-    return text, info, msg.model_dump(mode="json"), signals
 
 
 def is_retryable(e: Exception) -> bool:
@@ -410,7 +354,7 @@ def freeze(out_dir: Path, names: List[str]) -> None:
 
 def _sdk_versions() -> Dict[str, Optional[str]]:
     out: Dict[str, Optional[str]] = {"python": platform.python_version()}
-    for mod in ("openai", "anthropic"):
+    for mod in ("openai",):
         try:
             out[mod] = __import__(mod).__version__
         except Exception:
@@ -422,14 +366,12 @@ def _sdk_versions() -> Dict[str, Optional[str]]:
 
 def make_call(agent: str, system: str, user: str, model: str, temperature: Optional[float],
               max_tokens: Optional[int], effort: Optional[str]) -> Callable[[], tuple]:
-    if agent == "claude":
-        return lambda: call_anthropic(system, user, model, effort, max_tokens)
     return lambda: call_openai_compatible(agent, system, user, model, temperature, max_tokens,
                                           effort)
 
 
 def run_builtin(agent: str, model: str, vuln_id: str, repetition: int, case_dir: Path,
-                out_dir: Path, prompt_version: str, temperature: Optional[float],
+                out_dir: Path, temperature: Optional[float],
                 max_tokens: Optional[int], effort: Optional[str],
                 call_factory: Callable = make_call,
                 sleep: Optional[Callable[[float], None]] = None) -> int:
@@ -438,7 +380,7 @@ def run_builtin(agent: str, model: str, vuln_id: str, repetition: int, case_dir:
               f"regenerate (no retries).", file=sys.stderr)
         return 3
 
-    system = SYSTEM_PROMPTS[prompt_version]
+    system = SYSTEM_PROMPT
     meta = load_meta(case_dir)
     files = collect_context_files(case_dir, meta)
     user = build_user_prompt(vuln_id, files)
@@ -450,7 +392,7 @@ def run_builtin(agent: str, model: str, vuln_id: str, repetition: int, case_dir:
         "agent": agent, "provider": PROVIDERS[agent]["provider"], "model": model,
         "vuln_id": vuln_id, "repetition": repetition,
         "timestamp_utc": _now(),
-        "prompt_version": prompt_version,
+        "prompt_version": PROMPT_VERSION,
         "context_files": [r for r, _ in files],
         "prompt_sha256": hashlib.sha256((system + "\n" + user).encode()).hexdigest(),
         "settings": {"temperature": temperature,
@@ -459,6 +401,8 @@ def run_builtin(agent: str, model: str, vuln_id: str, repetition: int, case_dir:
                      "reasoning_effort": effort,
                      "request_timeout_s": REQUEST_TIMEOUT_S,
                      "max_api_retries": MAX_API_RETRIES, "sdk_auto_retries": 0,
+                     # Records that no fallback model was used, so every response
+                     # comes from the evaluated model.
                      "fallback_models": None},
         "versions": _sdk_versions(),
     }
@@ -519,55 +463,37 @@ def run_builtin(agent: str, model: str, vuln_id: str, repetition: int, case_dir:
     return 0 if status == "ok" else 4
 
 
-def verify_external(agent: str, vuln_id: str, out_dir: Path) -> int:
-    patch = out_dir / "patch.diff"
-    if not patch.exists():
-        print(f"[external] expected {patch}; not found.", file=sys.stderr)
-        return 2
-    (out_dir / "generation.json").write_text(
-        json.dumps({"agent": agent, "vuln_id": vuln_id, "source": "external"}, indent=2),
-        encoding="utf-8")
-    return 0
-
-
 def main():
     ap = argparse.ArgumentParser(description="Generate a patch + claim + confidence and freeze it.")
-    ap.add_argument("--agent", required=True, choices=sorted(BUILTIN | EXTERNAL))
-    ap.add_argument("--model", help="Model id sent to the API (required for built-in agents)")
-    ap.add_argument("--repetition", type=int, help="Repetition number k >= 1 (built-in agents)")
+    ap.add_argument("--agent", required=True, choices=sorted(PROVIDERS))
+    ap.add_argument("--model", required=True, help="Model id sent to the API")
+    ap.add_argument("--repetition", type=int, required=True, help="Repetition number k >= 1")
     ap.add_argument("--vuln-id", help="Single vuln to run")
     ap.add_argument("--ids-file", type=Path, help="File with one vuln id per line")
     ap.add_argument("--workspaces", type=Path, default=WORKSPACES)
     ap.add_argument("--runs", type=Path, default=RUNS,
                     help="Study root; attempts go to <runs>/<agent>/<id>/rep<k>/")
     ap.add_argument("--limit", type=int, default=None)
-    ap.add_argument("--prompt-version", choices=sorted(SYSTEM_PROMPTS), default="v2")
     ap.add_argument("--temperature", type=float, default=None,
-                    help="Only sent if given; not accepted for --agent claude")
+                    help="Only sent if given")
     ap.add_argument("--max-tokens", type=int, default=DEFAULT_MAX_OUTPUT_TOKENS,
                     help=f"Output token limit, always sent (default {DEFAULT_MAX_OUTPUT_TOKENS}; "
-                         f"max_completion_tokens for gpt, max_tokens for deepseek/claude)")
+                         f"max_completion_tokens for gpt, max_tokens for deepseek)")
     ap.add_argument("--reasoning-effort", dest="effort", default=DEFAULT_REASONING_EFFORT,
                     help=f"Always sent (default {DEFAULT_REASONING_EFFORT}). gpt: reasoning_effort "
                          f"{'/'.join(PROVIDERS['gpt']['efforts'])}; deepseek: reasoning_effort "
-                         f"{'/'.join(PROVIDERS['deepseek']['efforts'])}; claude: output_config.effort "
-                         f"{'/'.join(PROVIDERS['claude']['efforts'])}")
+                         f"{'/'.join(PROVIDERS['deepseek']['efforts'])}")
     args = ap.parse_args()
 
-    if args.agent in BUILTIN:
-        if not args.model:
-            sys.exit(f"--model is required for --agent {args.agent}")
-        if not args.repetition or args.repetition < 1:
-            sys.exit("--repetition k (k >= 1) is required for built-in agents")
-        key_env = PROVIDERS[args.agent]["key_env"]
-        if not os.environ.get(key_env):
-            sys.exit(f"{key_env} is not set; no API call was made")
-        allowed = PROVIDERS[args.agent]["efforts"]
-        if args.effort not in allowed:
-            sys.exit(f"--reasoning-effort {args.effort!r} is not a documented value for "
-                     f"--agent {args.agent} (allowed: {', '.join(allowed)})")
-        if args.agent == "claude" and args.temperature is not None:
-            sys.exit("--temperature is not accepted by current Claude models")
+    if args.repetition < 1:
+        sys.exit("--repetition k (k >= 1) is required")
+    key_env = PROVIDERS[args.agent]["key_env"]
+    if not os.environ.get(key_env):
+        sys.exit(f"{key_env} is not set; no API call was made")
+    allowed = PROVIDERS[args.agent]["efforts"]
+    if args.effort not in allowed:
+        sys.exit(f"--reasoning-effort {args.effort!r} is not a documented value for "
+                 f"--agent {args.agent} (allowed: {', '.join(allowed)})")
 
     if args.vuln_id:
         targets = [args.vuln_id]
@@ -584,24 +510,17 @@ def main():
     counts: Dict[str, int] = {}
     for vid in targets:
         case_dir = args.workspaces / vid
-        if args.agent in BUILTIN:
-            out_dir = args.runs / args.agent / vid / f"rep{args.repetition}"
-        else:
-            out_dir = args.runs / args.agent / vid
+        out_dir = args.runs / args.agent / vid / f"rep{args.repetition}"
         if not case_dir.exists():
             print(f"[!] {vid}: no workspace at {case_dir}; skipping", file=sys.stderr)
             counts["no_workspace"] = counts.get("no_workspace", 0) + 1
             continue
-        if args.agent in BUILTIN:
-            rc = run_builtin(args.agent, args.model, vid, args.repetition, case_dir, out_dir,
-                             args.prompt_version, args.temperature, args.max_tokens,
-                             args.effort)
-            if rc == 2:
-                print("[stop] configuration error: fix it and re-run; nothing was frozen "
-                      "for this attempt.", file=sys.stderr)
-                sys.exit(2)
-        else:
-            rc = verify_external(args.agent, vid, out_dir)
+        rc = run_builtin(args.agent, args.model, vid, args.repetition, case_dir, out_dir,
+                         args.temperature, args.max_tokens, args.effort)
+        if rc == 2:
+            print("[stop] configuration error: fix it and re-run; nothing was frozen "
+                  "for this attempt.", file=sys.stderr)
+            sys.exit(2)
         label = {0: "ok", 3: "already_frozen", 4: "no_usable_answer",
                  5: "api_error_exhausted", 6: "needs_review"}.get(rc, f"rc_{rc}")
         counts[label] = counts.get(label, 0) + 1
