@@ -14,7 +14,7 @@ It stops the whole run when:
   - MAX_CONSECUTIVE_EXHAUSTED attempts in a row of the same model end with no
     response after all retries (repeated API errors).
 
-usage: run_study.py --ids-file results/selection/selected_ids.txt --runs runs/full
+usage: run_study.py --ids-file results/selection_v2/selected_ids.txt --runs runs/final
 """
 from __future__ import annotations
 

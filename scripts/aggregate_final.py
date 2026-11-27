@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-aggregate_final.py  --  final metrics of the full study (research_project_readme.md, section 5).
+aggregate_final.py  --  final metrics of the full study (metrics defined in README.md).
 
 Reads every attempt under <runs>/<agent>/<vuln_id>/rep<k>/ (generation.json + eval.json)
 and writes to <out>:
@@ -8,7 +8,7 @@ and writes to <out>:
     metrics.json            all metrics, CIs and counts per model (+ model differences)
     metrics.md / .tex       main table
     outcomes.md / .tex      outcome breakdown per model
-    exclusions.md / .tex    OK cases excluded by each oracle control (from select_cases.py)
+    exclusions.md / .tex    scan-OK cases excluded from the pool (from select_cases.py)
     fig_metrics.png, fig_reliability.png, fig_latency.png
 
 Definitions (spec section 5):
@@ -395,10 +395,10 @@ def charts(out: Path, per_model: Dict, valid: Dict[str, List[Dict]], all_rows: L
 
 def main():
     ap = argparse.ArgumentParser(description="Final aggregation of the full study.")
-    ap.add_argument("--runs", type=Path, default=HERE / "runs/full")
-    ap.add_argument("--ids-file", type=Path, default=HERE / "results/selection/selected_ids.txt")
-    ap.add_argument("--selection-dir", type=Path, default=HERE / "results/selection")
-    ap.add_argument("--out", type=Path, default=HERE / "results/final")
+    ap.add_argument("--runs", type=Path, default=HERE / "runs/final")
+    ap.add_argument("--ids-file", type=Path, default=HERE / "results/selection_v2/selected_ids.txt")
+    ap.add_argument("--selection-dir", type=Path, default=HERE / "results/selection_v2")
+    ap.add_argument("--out", type=Path, default=HERE / "results/final_v2")
     ap.add_argument("--bootstrap", type=int, default=10000)
     ap.add_argument("--seed", type=int, default=20261124)
     args = ap.parse_args()
@@ -491,7 +491,7 @@ def main():
         s = json.loads(sel_p.read_text())
         selection = {k: s[k] for k in ("seed", "n_ok", "n_eligible", "n_excluded", "n_selected",
                                         "scan_status_counts")}
-        selection["eligibility"] = s.get("eligibility", "controls")
+        selection["eligibility"] = s.get("eligibility")
         selection["selected"] = s.get("selected")
         selection["excluded"] = [{"cve_id": e["cve_id"], "reason": e["reason"]}
                                  for e in s.get("excluded", [])]
@@ -580,9 +580,9 @@ def main():
         encoding="utf-8")
 
     # Exclusions table
-    if exclusions and selection.get("eligibility") == "scan-ok":
-        # Official run: eligibility = scan OK; the only exclusion rule is a
-        # missing new_code_files (no source file for the prompt).
+    if exclusions:
+        # Eligibility = scan OK; the only exclusion rule is a missing
+        # new_code_files (no source file for the prompt).
         e_rows = [[e["cve_id"], e["reason"]] for e in selection.get("excluded", [])] or \
                  [["(none)", ""]]
         pre = (f"Scan OK: {selection.get('n_ok')}; eligible: {selection.get('n_eligible')}; "
@@ -594,18 +594,6 @@ def main():
         (args.out / "exclusions.tex").write_text(
             tex_table(["Case", "Reason"], e_rows,
                       "Cases with scan status OK excluded from the pool. " + pre,
-                      "tab:exclusions"), encoding="utf-8")
-    elif exclusions:
-        e_rows = [[e["control"], e["ok_cases_failing"]] for e in exclusions]
-        pre = (f"Scan OK: {selection.get('n_ok')}; eligible: {selection.get('n_eligible')}; "
-               f"selected: {selection.get('n_selected')} (seed {selection.get('seed')}). "
-               f"A case can fail more than one control.")
-        (args.out / "exclusions.md").write_text(
-            "# OK cases excluded by each oracle control\n\n"
-            + md_table(["Control", "OK cases failing"], e_rows) + f"\n{pre}\n", encoding="utf-8")
-        (args.out / "exclusions.tex").write_text(
-            tex_table(["Control", "OK cases failing"], e_rows,
-                      "Cases with scan status OK excluded by each oracle control. " + pre,
                       "tab:exclusions"), encoding="utf-8")
 
     charts(args.out, per_model, valid_by_agent, rows)

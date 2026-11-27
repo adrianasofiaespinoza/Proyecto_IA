@@ -66,7 +66,7 @@ HERE = Path(__file__).resolve().parent.parent
 WORKSPACES = HERE / "workspaces"
 RUNS = HERE / "runs"
 
-# Study models (research_project_readme.md, section 8): gpt-6-luna and deepseek-flash.
+# Study models (see README.md): gpt-6-luna and deepseek-flash.
 # reasoning-effort values accepted per provider (from each provider's docs); values
 # that a provider would silently remap (e.g. DeepSeek medium -> high) are rejected.
 PROVIDERS = {
@@ -107,7 +107,7 @@ SYSTEM_PROMPT_V1 = (
     "You do not have access to the internet nor external tools."
 )
 # v2: full study. Confidence = probability of passing the complete verification,
-# independently of the claim (research_project_readme.md, sections 5 and 8).
+# independently of the claim (see README.md).
 SYSTEM_PROMPT_V2 = (
     _COMMON_PROMPT
     + "\"claimed_success\": 1 if you claim the patch eliminates the vulnerability "
