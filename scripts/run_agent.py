@@ -1,53 +1,4 @@
 #!/usr/bin/env python3
-"""
-run_agent.py  (modified for the false-assurance experiment)
-
-One attempt per (agent, vuln_id, repetition). Output directory:
-    <runs>/<agent>/<vuln_id>/rep<k>/
-        system_prompt.txt       system prompt sent
-        prompt.txt              user prompt sent (vulnerable source only, no fix info)
-        raw_api_response.json   full API response object, untouched (absent if no response)
-        llm_response.json       raw text + parsed claimed_success / confidence / diff
-        patch.diff              the diff exactly as returned by the model (only if parsed)
-        api_attempts.json       every API call made for this attempt, failed ones included
-        generation.json         model, tokens, latency_ms, timestamp, status, error, settings
-        frozen.json             SHA-256 of every file above; files set read-only
-
-Agents (both receive exactly the same prompts):
-    gpt       OpenAI Chat Completions          key: OPENAI_API_KEY     study model: gpt-6-luna
-    deepseek  DeepSeek (OpenAI-compatible)     key: DEEPSEEK_API_KEY   study model: deepseek-flash
-
-Study settings, always sent explicitly and recorded in generation.json["settings"]:
-    reasoning effort  high    (reasoning_effort)
-    output limit      64000   (gpt: max_completion_tokens; deepseek: max_tokens)
-Reasoning levels are named alike but are not calibrated identically across providers.
-Each call's request/response times are stored as ISO-8601 UTC (request_utc, response_utc).
-
-Generation status recorded in generation.json:
-    ok                   JSON parsed: diff, claimed_success and confidence are valid
-    refusal              the API reports a refusal (message.refusal or
-                         finish_reason "content_filter")
-    truncated            output cut by the token limit and not parseable
-    parse_error          any other unparseable answer
-    api_error_exhausted  no response after MAX_API_RETRIES retries (infrastructure)
-evaluate.py scores refusal / truncated / parse_error as a failed repair with C=0
-(complete observation) and api_error_exhausted as incomplete (excluded from N_valid).
-
-API errors: only failures that return no model output are retried (connection
-errors, timeouts, HTTP 408/409/429/5xx), at most MAX_API_RETRIES times. Every call
-is logged in api_attempts.json, which is written before each call so that an
-interrupted run leaves a trace; interrupted calls count against the retry budget.
-Other HTTP errors (400/401/403/404/...) are configuration errors: nothing is frozen
-and the whole run stops. The SDKs' own automatic retries are disabled
-(max_retries=0) so that every call is visible in the log.
-
-Latency (identical definition for both providers): wall-clock time from just
-before the request is sent until the complete response has been received.
-
-The LLM only sees the vulnerable source and the fixed prompt. Verification
-results are never sent to it. Once frozen.json exists, this script refuses to
-regenerate that attempt.
-"""
 from __future__ import annotations
 
 import argparse
@@ -85,9 +36,7 @@ RETRYABLE_STATUS = {408, 409, 429}  # plus every status >= 500
 DEFAULT_MAX_OUTPUT_TOKENS = 64000   # common output limit (reasoning included where counted)
 DEFAULT_REASONING_EFFORT = "high"   # sent explicitly to every provider
 
-# System prompt of the study (stored as prompt_version "v2" in generation.json).
-# Confidence = probability of passing the complete verification, independently
-# of the claim (see README.md).
+
 PROMPT_VERSION = "v2"
 SYSTEM_PROMPT = (
     "You are a security expert and a Python programmer. I will provide you with "
